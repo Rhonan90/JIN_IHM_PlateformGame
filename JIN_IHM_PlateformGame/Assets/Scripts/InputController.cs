@@ -4,21 +4,26 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
-    private Engine engine;
-    private PlayerAvatar playerAvatar;
+    private Vector2 speed;
+    private Vector2 position;
+
+    public Vector2 maxSpeed;
 
     void Start()
     {
-        engine = GetComponent<Engine>();
-        playerAvatar = GetComponent<PlayerAvatar>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        float horizontalSpeedPercent = Input.GetAxis("Horizontal");
-        float maxSpeed = playerAvatar.MaxSpeed;
+        Vector2 speedInput = new Vector2(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
 
-        engine.speed.x = maxSpeed * horizontalSpeedPercent;
+        speed = maxSpeed * speedInput;  // ~ (1 - a) * speed + a * speedInput pour simuler un peu d'inertie
+
+        position.x += speed.x * Time.deltaTime;
+        position.y = transform.position.y;
+        transform.position = position;
+
     }
 }
