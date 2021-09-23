@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 7905766681907340837}
   - component: {fileID: 7905766681907340838}
   - component: {fileID: 1913770134544976240}
-  - component: {fileID: 7186977821888524511}
-  - component: {fileID: 7144888060556779662}
   - component: {fileID: -5591228904907304908}
   m_Layer: 0
   m_Name: Player
@@ -95,9 +93,9 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7905766681907340839}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -118,7 +116,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -134,33 +132,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &7186977821888524511
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7905766681907340839}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e527c63fe107b7b4cb82aae94d342a95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxSpeed: 10
---- !u!114 &7144888060556779662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7905766681907340839}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f673265c5d6738943ac526e23a95ba23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: {x: 0, y: 0}
-  position: {x: 0, y: 0}
 --- !u!114 &-5591228904907304908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,3 +144,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6823e988a82c0546b1cef300feafd30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  timeSinceJump: 0
+  movementSpeed: 10
+  inertia: 0.1
+  jumpForce: 13
+  customGravity: -15
+  airTime: 0.2
