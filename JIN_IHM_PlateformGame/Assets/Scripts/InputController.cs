@@ -2,28 +2,81 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum playerState
+{
+    Grounded,
+    Flying
+};
+
 public class InputController : MonoBehaviour
 {
-    private Vector2 speed;
     private Vector2 position;
+    private Vector2 speed;
+    private Vector2 speedInput;
 
-    public Vector2 maxSpeed;
+    private bool jump = false;
+    private float airTime = 10;
 
-    void Start()
+    public float movementSpeed = 20;
+    public float inertia = 0.95f;
+    public float jumpForce = 10 ;
+    public float customGravity = -10;
+
+    playerState state = playerState.Flying;
+
+    private void Awake()
     {
+        position = transform.position;
 
+        this.gameObject.SetActive(false);
+        
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        Vector2 speedInput = new Vector2(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
+        getInput();
 
-        speed = maxSpeed * speedInput;  // ~ (1 - a) * speed + a * speedInput pour simuler un peu d'inertie
+        speed = speedInput * Time.deltaTime * movementSpeed + inertia * speed; ;  //simule l'accélération et une certaine inertie     
 
-        position.x += speed.x * Time.deltaTime;
-        position.y = transform.position.y;
-        transform.position = position;
+        airTime += Time.deltaTime;
+        if (jump && (state == playerState.Grounded  || airTime < 0.3) )
+        {
+            speed.y = jumpForce * Time.deltaTime;
+        }
+        else
+        {
+            speed.y = customGravity * Time.deltaTime;
+        }
 
+        if (state == playerState.Grounded && speed.y < 0)  //anti clipping dans le sol
+            speed.y = 0;
+
+        position.x += speed.x * Time.deltaTime;  //horitontal movement
+        position.y += speed.y * Time.deltaTime;  //vertical movement
+        transform.position = position;  //update position
+
+        Debug.Log(state);
     }
+
+    private void getInput()
+    {
+        speedInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
+        jump = Input.GetButton("Jump");
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            state = playerState.Grounded;
+            airTime = 0;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+            state = playerState.Flying;
+    }
+
 }
