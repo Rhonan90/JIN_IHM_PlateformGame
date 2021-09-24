@@ -13,7 +13,6 @@ public class InputController : MonoBehaviour
 
 
     private bool jump = false;
-    private bool grounded = false;
     private float timeSinceJump = 0;
 
     public float movementSpeed = 20;        //Vitesse du joueur
@@ -27,7 +26,9 @@ public class InputController : MonoBehaviour
     private bool touchingTop;               //Test si mur au dessus pour les collisions
     private bool touchingDown;              //Test si mur en dessous pour les collisions
 
-    
+    private float extraRaycastCheck = 0.1f;
+
+
     private void Awake()
     {
         position = transform.position;
@@ -45,20 +46,28 @@ public class InputController : MonoBehaviour
         else
             timeSinceJump += Time.deltaTime;
         
-        if (jump && (grounded  || timeSinceJump < airTime) ) //Gestion vitesse verticale
+        if (jump && (touchingDown || timeSinceJump < airTime) ) //Gestion vitesse verticale
             speed.y = jumpForce;
         else
             speed.y = customGravity;
 
-        if (IsTouchingWall())  //anti clipping dans les objets
+        IsGrounded();
+        if ((touchingDown && speed.y < 0) && !(jump))  //collision en bas
         {
-            if ((touchingLeft && speed.x < 0) || (touchingRight && speed.x > 0))  //collision à gauche ou droite
-                speed.x = 0;
-            if ((touchingDown && speed.y < 0) && !(jump) )  //collision en bas
-                speed.y = 0;
-            if (touchingTop && speed.y > 0) //collision en haut
-                speed.y = customGravity;
+            speed.y = 0;
         }
+
+        IsTouchingWall();
+        if (touchingLeft && speed.x < 0 || touchingRight && speed.x > 0)  //collision à gauche
+        {
+            speed.x = 0;
+        }
+
+        IsTouchingCeiling();
+        if (touchingTop && speed.y > 0) //collision en haut
+        {
+            speed.y = customGravity;
+        }        
 
         position.x += speed.x * Time.deltaTime;  //horitontal movement
         position.y += speed.y * Time.deltaTime;  //vertical movement
@@ -73,10 +82,10 @@ public class InputController : MonoBehaviour
 
     private bool IsGrounded()   //Utilisation du raycast pour detecter les collisions au sol
     {
-        RaycastHit2D raycastHit = Physics2D.Raycast(boxCollider2d.bounds.center, Vector2.down, boxCollider2d.bounds.extents.y, floorLayerMask);
+        RaycastHit2D raycastHitDown = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(0, extraRaycastCheck, 0), Vector2.right, boxCollider2d.bounds.size.x, floorLayerMask);
 
         Color rayColor; //Debut debuging
-        if (raycastHit.collider != null)
+        if (raycastHitDown.collider != null)
         {
             rayColor = Color.green;
         }
@@ -84,20 +93,17 @@ public class InputController : MonoBehaviour
         {
             rayColor = Color.red;
         }
-        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.down * (boxCollider2d.bounds.extents.y), rayColor);
-        Debug.Log(raycastHit.collider); //Fin debuging
+        Debug.DrawRay(boxCollider2d.bounds.min - new Vector3(0, extraRaycastCheck, 0), Vector2.right * boxCollider2d.bounds.size.x, rayColor);
+        Debug.Log(raycastHitDown.collider); //Fin debuging
 
-        grounded = raycastHit.collider != null ;
-        return grounded;
+        touchingDown = raycastHitDown.collider != null ;
+        return touchingDown;
     }
 
     private bool IsTouchingWall()   //Utilisation du raycast pour detecter les collisions au sol
     {
-        float extraHeightText = 0.1f;
-        RaycastHit2D raycastHitLeft = Physics2D.Raycast(boxCollider2d.bounds.center, Vector2.left, boxCollider2d.bounds.extents.x + extraHeightText, floorLayerMask);
-        RaycastHit2D raycastHitRight = Physics2D.Raycast(boxCollider2d.bounds.center, Vector2.right, boxCollider2d.bounds.extents.x + extraHeightText, floorLayerMask);
-        RaycastHit2D raycastHitTop = Physics2D.Raycast(boxCollider2d.bounds.center, Vector2.up, boxCollider2d.bounds.extents.y + extraHeightText, floorLayerMask);
-        RaycastHit2D raycastHitDown = Physics2D.Raycast(boxCollider2d.bounds.center, Vector2.down, boxCollider2d.bounds.extents.y + extraHeightText, floorLayerMask);
+        RaycastHit2D raycastHitLeft = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(extraRaycastCheck, 0, 0), Vector2.up, boxCollider2d.bounds.size.y, floorLayerMask);
+        RaycastHit2D raycastHitRight = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(extraRaycastCheck, 0, 0), Vector2.down, boxCollider2d.bounds.size.y, floorLayerMask);
 
         Color rayColorLeft; //Debut debuging
         Color rayColorRight;
@@ -112,18 +118,36 @@ public class InputController : MonoBehaviour
         else
             rayColorRight = Color.red;
 
-        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.left * (boxCollider2d.bounds.extents.x + extraHeightText), rayColorLeft);
-        Debug.DrawRay(boxCollider2d.bounds.center, Vector2.right * (boxCollider2d.bounds.extents.x + extraHeightText), rayColorRight);
+        Debug.DrawRay(boxCollider2d.bounds.min - new Vector3(extraRaycastCheck, 0, 0), Vector2.up * (boxCollider2d.bounds.size.y), rayColorLeft);
+        Debug.DrawRay(boxCollider2d.bounds.max + new Vector3(extraRaycastCheck, 0, 0), Vector2.down * (boxCollider2d.bounds.size.y), rayColorRight);
 
         Debug.Log(raycastHitLeft.collider);
         Debug.Log(raycastHitRight.collider);//Fin debuging
 
         touchingLeft = raycastHitLeft.collider != null;
         touchingRight = raycastHitRight.collider != null;
-        touchingTop = raycastHitTop.collider != null;
-        touchingDown = raycastHitDown.collider != null;
 
-        return touchingLeft || touchingRight || touchingTop || touchingDown;
+        return touchingLeft || touchingRight;
+    }
+
+    private bool IsTouchingCeiling()   //Utilisation du raycast pour detecter les collisions au sol
+    {
+        RaycastHit2D raycastHitTop = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(0, extraRaycastCheck, 0), Vector2.left, boxCollider2d.bounds.size.x, floorLayerMask);
+
+        Color rayColor; //Debut debuging
+        if (raycastHitTop.collider != null)
+        {
+            rayColor = Color.green;
+        }
+        else
+        {
+            rayColor = Color.red;
+        }
+        Debug.DrawRay(boxCollider2d.bounds.max + new Vector3(0, extraRaycastCheck, 0), Vector2.left * boxCollider2d.bounds.size.x, rayColor);
+        Debug.Log(raycastHitTop.collider); //Fin debuging
+
+        touchingTop = raycastHitTop.collider != null;
+        return touchingTop;
     }
 
 }
