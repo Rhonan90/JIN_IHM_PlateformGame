@@ -10,6 +10,7 @@ public class InputController : MonoBehaviour
     private Vector2 position;
     private Vector2 speed;
     private Vector2 speedInput;
+    private Vector3 speedIncrement;
 
     private bool sprint = false;
     private bool jump = false;
@@ -36,12 +37,14 @@ public class InputController : MonoBehaviour
     {
         position = transform.position;
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
-        speed = Vector2.zero;
+        speed = new Vector2();
+        speedIncrement = new Vector3();
     }
 
     private void Update()
     {
         getInput();
+
 
         speed =  speedInput * movementSpeed; // + inertia * Time.deltaTime * new Vector2(speed.x,0) ;   //simule une certaine inertie     //TODO : fix inertia : idea detlatime
 
@@ -92,6 +95,7 @@ public class InputController : MonoBehaviour
 
         position.x += speed.x * Time.deltaTime;  //horitontal movement
         position.y += speed.y * Time.deltaTime;  //vertical movement
+        speedIncrement = new Vector3(speed.x * Time.deltaTime, speed.y * Time.deltaTime, 0);  //sert à caster en avance pour les collisions
         transform.position = position;  //update position
     }
 
@@ -104,7 +108,7 @@ public class InputController : MonoBehaviour
 
     private bool IsGrounded()   //Utilisation du raycast pour detecter les collisions au sol
     {
-        RaycastHit2D raycastHitDown = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(0, extraRaycastCheck, 0), Vector2.right, boxCollider2d.bounds.size.x, floorLayerMask);
+        RaycastHit2D raycastHitDown = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(0, extraRaycastCheck, 0) + speedIncrement, Vector2.right, boxCollider2d.bounds.size.x, floorLayerMask);
 
         Color rayColor; //Debut debuging
         if (raycastHitDown.collider != null)
@@ -125,8 +129,8 @@ public class InputController : MonoBehaviour
 
     private bool IsTouchingWall()   //Utilisation du raycast pour detecter les collisions au sol
     {
-        RaycastHit2D raycastHitLeft = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(extraRaycastCheck, 0, 0), Vector2.up, boxCollider2d.bounds.size.y, floorLayerMask);
-        RaycastHit2D raycastHitRight = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(extraRaycastCheck, 0, 0), Vector2.down, boxCollider2d.bounds.size.y, floorLayerMask);
+        RaycastHit2D raycastHitLeft = Physics2D.Raycast(boxCollider2d.bounds.min - new Vector3(extraRaycastCheck, 0, 0) + speedIncrement, Vector2.up, boxCollider2d.bounds.size.y, floorLayerMask);
+        RaycastHit2D raycastHitRight = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(extraRaycastCheck, 0, 0) + speedIncrement, Vector2.down, boxCollider2d.bounds.size.y, floorLayerMask);
 
         Color rayColorLeft; //Debut debuging
         Color rayColorRight;
@@ -155,7 +159,7 @@ public class InputController : MonoBehaviour
 
     private bool IsTouchingCeiling()   //Utilisation du raycast pour detecter les collisions au sol
     {
-        RaycastHit2D raycastHitTop = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(0, extraRaycastCheck, 0), Vector2.left, boxCollider2d.bounds.size.x, floorLayerMask);
+        RaycastHit2D raycastHitTop = Physics2D.Raycast(boxCollider2d.bounds.max + new Vector3(0, extraRaycastCheck, 0) + speedIncrement, Vector2.left, boxCollider2d.bounds.size.x, floorLayerMask);
 
         Color rayColor; //Debut debuging
         if (raycastHitTop.collider != null)
