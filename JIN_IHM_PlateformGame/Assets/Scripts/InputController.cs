@@ -11,8 +11,9 @@ public class InputController : MonoBehaviour
     private Vector2 speed;
     private Vector2 speedInput;
 
-
+    private bool sprint = false;
     private bool jump = false;
+    private bool canDoubleJump = false;
     private float timeSinceJump = 0;
 
     public float movementSpeed = 20;        //Vitesse du joueur
@@ -20,6 +21,8 @@ public class InputController : MonoBehaviour
     public float jumpForce = 10 ;           //Vitesse du saut
     public float customGravity = -10;       //Force de gravite
     public float airTime = 0.2f;            //Temps en maximum dans les airs lors du saut
+    public float sprintVelocityModifier = 1.2f;   //Multiplicateur de vitesse en sprintant
+    public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
 
     private bool touchingRight;             //Test si mur à droite pour les collisions
     private bool touchingLeft;              //Test si mur à gauche pour les collisions
@@ -33,23 +36,40 @@ public class InputController : MonoBehaviour
     {
         position = transform.position;
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
+        speed = Vector2.zero;
     }
 
     private void Update()
     {
         getInput();
 
-        speed = speedInput * movementSpeed + inertia * speed;  //simule une certaine inertie     
+        speed =  speedInput * movementSpeed; // + inertia * Time.deltaTime * new Vector2(speed.x,0) ;   //simule une certaine inertie     //TODO : fix inertia : idea detlatime
+
+        if (sprint)
+        {
+            speed *= sprintVelocityModifier;  //
+        }
 
         if (IsGrounded()) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
+        {
             timeSinceJump = 0;
+            canDoubleJump = true; //resest du double saut quand on touche le sol
+        }
         else
             timeSinceJump += Time.deltaTime;
-        
-        if (jump && (touchingDown || timeSinceJump < airTime) ) //Gestion vitesse verticale
-            speed.y = jumpForce;
+
+
+        if (jump && (touchingDown || timeSinceJump < airTime))
+        {
+            speed.y = jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
+        }
+        else if (jump && (timeSinceJump > airTime) && canDoubleJump)
+        {
+            timeSinceJump = 0;
+            canDoubleJump = false;
+        }
         else
-            speed.y = customGravity;
+            speed.y += customGravity * Time.deltaTime;    //Le cube tombe  //TODO : à fix
 
         IsGrounded();
         if ((touchingDown && speed.y < 0) && !(jump))  //collision en bas
@@ -66,8 +86,9 @@ public class InputController : MonoBehaviour
         IsTouchingCeiling();
         if (touchingTop && speed.y > 0) //collision en haut
         {
-            speed.y = customGravity;
+            speed.y = 0;
         }        
+
 
         position.x += speed.x * Time.deltaTime;  //horitontal movement
         position.y += speed.y * Time.deltaTime;  //vertical movement
@@ -78,6 +99,7 @@ public class InputController : MonoBehaviour
     {
         speedInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
         jump = Input.GetButton("Jump");
+        sprint = Input.GetButton("Sprint");
     }
 
     private bool IsGrounded()   //Utilisation du raycast pour detecter les collisions au sol
@@ -97,6 +119,7 @@ public class InputController : MonoBehaviour
         Debug.Log(raycastHitDown.collider); //Fin debuging
 
         touchingDown = raycastHitDown.collider != null ;
+
         return touchingDown;
     }
 
