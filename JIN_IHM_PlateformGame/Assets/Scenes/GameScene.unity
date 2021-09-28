@@ -579,8 +579,24 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: -5591228904907304908, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5591228904907304908, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: customGravity
       value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: -5591228904907304908, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+      propertyPath: movementSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -5591228904907304908, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+      propertyPath: sprintJumpModifier
+      value: 1.4
+      objectReference: {fileID: 0}
+    - target: {fileID: -5591228904907304908, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+      propertyPath: sprintVelocityModifier
+      value: 1.4
       objectReference: {fileID: 0}
     - target: {fileID: 1913770134544976240, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: m_Size.x
@@ -702,6 +718,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7905766681907340839, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
   m_PrefabInstance: {fileID: 1246778258}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1471226572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1471226566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169f6115f890fda4fbc54d52e384cc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  movementSpeed: 20
+  mass: 1
+  jumpForce: 10
+  customGravity: -10
+  airTime: 0.2
+  sprintVelocityModifier: 1.2
+  sprintJumpModifier: 1.2
 --- !u!4 &1711072742 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4105874698675890509, guid: 2222dc8dc82d13e43a178e45f463d896, type: 3}
