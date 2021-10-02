@@ -620,11 +620,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7905766681907340836, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.5839937
+      value: 0.97
       objectReference: {fileID: 0}
     - target: {fileID: 7905766681907340836, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.9635234
+      value: 20.19
       objectReference: {fileID: 0}
     - target: {fileID: 7905766681907340836, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: m_LocalPosition.z
@@ -733,10 +733,12 @@ MonoBehaviour:
   floorLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  movementSpeed: 20
+  movementSpeed: 50
+  maxMovementSpeed: 10
+  inertiaFactor: 0.9
   mass: 1
-  jumpForce: 10
-  customGravity: -10
+  jumpForce: 15
+  customGravity: -100
   airTime: 0.2
   sprintVelocityModifier: 1.2
   sprintJumpModifier: 1.2

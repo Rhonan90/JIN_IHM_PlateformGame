@@ -19,6 +19,8 @@ public class InputController1 : MonoBehaviour
     private float timeSinceJump = 0;
 
     public float movementSpeed = 20;        //Vitesse du joueur
+    public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
+    public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
     public float mass = 20;                 //Masse du joueur
     public float jumpForce = 10 ;           //Vitesse du saut
     public float customGravity = -10;       //Force de gravite
@@ -48,11 +50,13 @@ public class InputController1 : MonoBehaviour
         getInput();
 
         acceleration = (inputs + new Vector2(0, customGravity)) / mass;
-        speed +=  acceleration * Time.deltaTime ; // + inertia * Time.deltaTime * new Vector2(speed.x,0) ;   //simule une certaine inertie     //TODO : fix inertia : idea detlatime
+        speed.x =  acceleration.x * Time.deltaTime * movementSpeed + inertiaFactor * speed.x; // simule une certaine inertie  
+        speed.y = acceleration.y * Time.deltaTime; 
+        speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);
 
         if (sprint)
         {
-            speed *= sprintVelocityModifier;  //
+            speed.x *= sprintVelocityModifier;  //TODO : fix
         }
 
         if (IsGrounded()) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
