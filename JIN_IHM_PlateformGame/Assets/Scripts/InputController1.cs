@@ -13,6 +13,8 @@ public class InputController1 : MonoBehaviour
 
     private bool sprint = false;
     private bool jump = false;
+    private bool jumping = false;
+    private bool jumped = false;
     private bool touchingFloor;              //Test si mur en dessous pour les collisions
     private bool canDoubleJump = false;
     private float timeJumping = 0;
@@ -42,9 +44,11 @@ public class InputController1 : MonoBehaviour
     {
         getInput();
 
-        acceleration = (inputs + new Vector2(0, customGravity)) / mass;
+        acceleration = (inputs + new Vector2(0, customGravity + (jumping ? jumpForce : 0 ))) / mass;
+
         speed.x =  acceleration.x * Time.deltaTime * movementSpeed + inertiaFactor * speed.x; // simule une certaine inertie  
         speed.y = acceleration.y * Time.deltaTime; 
+
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
 
         if (sprint)
@@ -52,8 +56,8 @@ public class InputController1 : MonoBehaviour
             speed.x *= sprintVelocityModifier;  //TODO : fix
         }
 
-        touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
 
+        touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
@@ -68,23 +72,28 @@ public class InputController1 : MonoBehaviour
             timeOnFloor = 0;
         }
 
-        if (jump && ( (touchingFloor && timeOnFloor > timeBeforeRejumpOnFloor) || (!touchingFloor && timeJumping < airTime)) )
+        //if (jump && ( (touchingFloor && timeOnFloor > timeBeforeRejumpOnFloor) || (!touchingFloor && timeJumping < airTime)) )
+        //{
+        //    speed.y += jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
+        //}
+        //else if (jump && (timeJumping > airTime + timeBeforeRejumpInAir) && canDoubleJump)  //TODO: condition à raffiner : "airTime + timeBeforeRejumpInAir" 
+        //{
+        //    timeJumping = 0;
+        //    canDoubleJump = false;
+        //}
+        //else
+        //    speed.y += customGravity * Time.deltaTime;    //Le cube tombe  
+
+        if (jump && touchingFloor && !jumping)
         {
-            speed.y += jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
+            StartCoroutine("JumpCoroutine");
         }
-        else if (jump && (timeJumping > airTime + timeBeforeRejumpInAir) && canDoubleJump)  //TODO: condition à raffiner : "airTime + timeBeforeRejumpInAir" 
-        {
-            timeJumping = 0;
-            canDoubleJump = false;
-        }
-        else
-            speed.y += customGravity * Time.deltaTime;    //Le cube tombe  
 
 
         //Gestion des collisions et du déplacement//
-        if (!CheckCollisions(collider2d, new Vector2(speed.x,0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur
+        if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur    /!\ TODO : Mathf.Abs(speed.x) * Time.deltaTime) à affiner
             position.x += speed.x * Time.deltaTime;  //horitontal movement
-        if (!CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans le sol ou le plafond
+        if (!CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans le sol ou le plafond    /!\ TODO : Mathf.Abs(speed.y) * Time.deltaTime) à affiner
             position.y += speed.y * Time.deltaTime;  //vertical movement
         transform.position = position;  //update position
     }
@@ -116,4 +125,11 @@ public class InputController1 : MonoBehaviour
         return false;
     }
 
+    private IEnumerator JumpCoroutine()
+    {
+        jumping = true;
+        yield return new WaitForSeconds(airTime);
+        jumped = true;
+        jumping = false;
+    }
 }

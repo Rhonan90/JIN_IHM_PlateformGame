@@ -730,16 +730,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 169f6115f890fda4fbc54d52e384cc84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
-  movementSpeed: 50
+  movementSpeed: 60
   maxMovementSpeed: 10
   inertiaFactor: 0.9
   mass: 1
-  jumpForce: 15
-  customGravity: -300
-  airTime: 0.2
+  jumpForce: 1200
+  customGravity: -500
+  airTime: 0.3
+  timeBeforeRejumpInAir: 0.2
+  timeBeforeRejumpOnFloor: 0.2
   sprintVelocityModifier: 1.2
   sprintJumpModifier: 1.2
 --- !u!4 &1711072742 stripped
