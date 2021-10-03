@@ -738,7 +738,7 @@ MonoBehaviour:
   inertiaFactor: 0.9
   mass: 1
   jumpForce: 15
-  customGravity: -100
+  customGravity: -300
   airTime: 0.2
   sprintVelocityModifier: 1.2
   sprintJumpModifier: 1.2
