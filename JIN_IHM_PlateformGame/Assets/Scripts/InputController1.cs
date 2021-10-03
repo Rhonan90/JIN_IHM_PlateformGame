@@ -14,11 +14,10 @@ public class InputController1 : MonoBehaviour
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
-    private bool jumped = false;
     private bool touchingFloor;              //Test si mur en dessous pour les collisions
     private bool canDoubleJump = false;
-    private float timeJumping = 0;
     private float timeOnFloor = 0;
+    private float timeAfterFirstJump = -1000;
 
     public float movementSpeed = 20;        //Vitesse du joueur
     public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
@@ -56,39 +55,25 @@ public class InputController1 : MonoBehaviour
             speed.x *= sprintVelocityModifier;  //TODO : fix
         }
 
-
         touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
-        {
-            timeJumping = 0;
-            timeOnFloor += Time.deltaTime;
-            canDoubleJump = true; //reset du double saut quand on touche le sol
-        }
+        {   timeOnFloor += Time.deltaTime;  }
         else
-        {
-            timeJumping += Time.deltaTime;
+        {   
             timeOnFloor = 0;
+            timeAfterFirstJump += Time.deltaTime;
         }
 
-        //if (jump && ( (touchingFloor && timeOnFloor > timeBeforeRejumpOnFloor) || (!touchingFloor && timeJumping < airTime)) )
-        //{
-        //    speed.y += jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
-        //}
-        //else if (jump && (timeJumping > airTime + timeBeforeRejumpInAir) && canDoubleJump)  //TODO: condition à raffiner : "airTime + timeBeforeRejumpInAir" 
-        //{
-        //    timeJumping = 0;
-        //    canDoubleJump = false;
-        //}
-        //else
-        //    speed.y += customGravity * Time.deltaTime;    //Le cube tombe  
-
-        if (jump && touchingFloor && !jumping)
+        if (jump && touchingFloor && !jumping && timeOnFloor > timeBeforeRejumpOnFloor)
         {
             StartCoroutine("JumpCoroutine");
         }
-
+        else if (jump && !touchingFloor && !jumping && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir)
+        {
+            StartCoroutine("DoubleJumpCoroutine");
+        }
 
         //Gestion des collisions et du déplacement//
         if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur    /!\ TODO : Mathf.Abs(speed.x) * Time.deltaTime) à affiner
@@ -129,7 +114,17 @@ public class InputController1 : MonoBehaviour
     {
         jumping = true;
         yield return new WaitForSeconds(airTime);
-        jumped = true;
+        jumping = false;
+        canDoubleJump = true;
+        timeAfterFirstJump = 0;
+        
+    }
+
+    private IEnumerator DoubleJumpCoroutine()
+    {
+        jumping = true;
+        canDoubleJump = false;
+        yield return new WaitForSeconds(airTime);
         jumping = false;
     }
 }
