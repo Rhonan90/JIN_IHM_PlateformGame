@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class InputController1 : MonoBehaviour
 {
-    [SerializeField] private LayerMask floorLayerMask;
-    private BoxCollider2D boxCollider2d;
     private Collider2D collider2d;
 
     private Vector2 position;
     private Vector2 speed;
     private Vector2 acceleration;
     private Vector2 inputs;
-    private Vector3 speedIncrement;
 
     private bool sprint = false;
     private bool jump = false;
+    private bool touchingFloor;              //Test si mur en dessous pour les collisions
     private bool canDoubleJump = false;
-    private float timeSinceJump = 0;
+    private float timeJumping = 0;
+    private float timeOnFloor = 0;
 
     public float movementSpeed = 20;        //Vitesse du joueur
     public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
@@ -25,20 +24,18 @@ public class InputController1 : MonoBehaviour
     public float mass = 20;                 //Masse du joueur
     public float jumpForce = 10 ;           //Vitesse du saut
     public float customGravity = -10;       //Force de gravite
-    public float airTime = 0.2f;            //Temps en maximum dans les airs lors du saut
+    public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
+    public float timeBeforeRejumpInAir = 0.2f;         //Temps avant de pouvoir resauter en l'air
+    public float timeBeforeRejumpOnFloor = 0.2f;       //Temps avant de pouvoir resauter au sol                                                   
     public float sprintVelocityModifier = 1.2f;   //Multiplicateur de vitesse en sprintant
     public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
-
-    private bool touchingDown;              //Test si mur en dessous pour les collisions
 
 
     private void Awake()
     {
         position = transform.position;
-        boxCollider2d = transform.GetComponent<BoxCollider2D>();
         collider2d = transform.GetComponent<Collider2D>();
         speed = new Vector2();
-        speedIncrement = new Vector3();
     }
 
     private void Update()
@@ -55,35 +52,40 @@ public class InputController1 : MonoBehaviour
             speed.x *= sprintVelocityModifier;  //TODO : fix
         }
 
-        touchingDown = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
-        
-        if (touchingDown) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
+        touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
+
+
+        //Gestion du saut et de la chute//
+        if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
         {
-            timeSinceJump = 0;
-            canDoubleJump = true; //resest du double saut quand on touche le sol
+            timeJumping = 0;
+            timeOnFloor += Time.deltaTime;
+            canDoubleJump = true; //reset du double saut quand on touche le sol
         }
         else
-            timeSinceJump += Time.deltaTime;
-
-
-        if (jump && (touchingDown || timeSinceJump < airTime))
         {
-            speed.y = jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
+            timeJumping += Time.deltaTime;
+            timeOnFloor = 0;
         }
-        else if (jump && (timeSinceJump > airTime) && canDoubleJump)
+
+        if (jump && ( (touchingFloor && timeOnFloor > timeBeforeRejumpOnFloor) || (!touchingFloor && timeJumping < airTime)) )
         {
-            timeSinceJump = 0;
+            speed.y += jumpForce * (sprint ? sprintJumpModifier : 1);   //On saute plus haut si on sprint
+        }
+        else if (jump && (timeJumping > airTime + timeBeforeRejumpInAir) && canDoubleJump)  //TODO: condition à raffiner : "airTime + timeBeforeRejumpInAir" 
+        {
+            timeJumping = 0;
             canDoubleJump = false;
         }
         else
             speed.y += customGravity * Time.deltaTime;    //Le cube tombe  
 
 
+        //Gestion des collisions et du déplacement//
         if (!CheckCollisions(collider2d, new Vector2(speed.x,0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur
             position.x += speed.x * Time.deltaTime;  //horitontal movement
         if (!CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans le sol ou le plafond
             position.y += speed.y * Time.deltaTime;  //vertical movement
-        speedIncrement = new Vector3(speed.x * Time.deltaTime, speed.y * Time.deltaTime, 0);  //sert à caster en avance pour les collisions
         transform.position = position;  //update position
     }
 
