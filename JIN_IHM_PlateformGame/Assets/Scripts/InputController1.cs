@@ -28,6 +28,7 @@ public class InputController1 : MonoBehaviour
     public float mass = 20;                 //Masse du joueur
     public float jumpForce = 10 ;           //Force du saut
     public float dashForce = 10;            //Force/vitesse du dash
+    public float dashDuration = 0.2f;            //Durée du dash
     public float customGravity = -10;       //Force de gravite
     public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
     public float timeBeforeRejumpInAir = 0.2f;         //Temps avant de pouvoir resauter en l'air
@@ -54,7 +55,7 @@ public class InputController1 : MonoBehaviour
 
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
 
-        if (sprint)
+        if (sprint && !sprint)  //désactivé pour l'instant
         {
             speed.x *= sprintVelocityModifier;  //TODO : fix
         }
@@ -82,7 +83,7 @@ public class InputController1 : MonoBehaviour
             StartCoroutine("DoubleJumpCoroutine");
         }
 
-        if(dash && !dashing && canDash) // && !touchingFloor ?    Le joueur peut dash au sol ou dans les airs une fois, le saut permet de dash à nouveau
+        if(dash && !dashing && canDash && !touchingFloor) //Le joueur peut dash dans les airs une fois, le saut permet de dash à nouveau
         {
             StartCoroutine("DashCoroutine");
         }
@@ -149,7 +150,7 @@ public class InputController1 : MonoBehaviour
         dashForce = dashDirection * Mathf.Abs(dashForce);
         dashing = true;
         canDash = false;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(dashDuration);
         dashing = false;
     }
 }
