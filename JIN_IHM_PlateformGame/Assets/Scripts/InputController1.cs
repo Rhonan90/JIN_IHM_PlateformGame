@@ -14,6 +14,9 @@ public class InputController1 : MonoBehaviour
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
+    private bool dash = false;
+    private bool dashing = false;
+    private bool canDash = false;
     private bool touchingFloor;              //Test si mur en dessous pour les collisions
     private bool canDoubleJump = false;
     private float timeOnFloor = 0;
@@ -23,7 +26,8 @@ public class InputController1 : MonoBehaviour
     public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
     public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
     public float mass = 20;                 //Masse du joueur
-    public float jumpForce = 10 ;           //Vitesse du saut
+    public float jumpForce = 10 ;           //Force du saut
+    public float dashForce = 10;            //Force/vitesse du dash
     public float customGravity = -10;       //Force de gravite
     public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
     public float timeBeforeRejumpInAir = 0.2f;         //Temps avant de pouvoir resauter en l'air
@@ -43,7 +47,7 @@ public class InputController1 : MonoBehaviour
     {
         getInput();
 
-        acceleration = (inputs + new Vector2(0, customGravity + (jumping ? jumpForce : 0 ))) / mass;
+        acceleration = (inputs + new Vector2((dashing ? dashForce : 0), (!dashing ? customGravity + (jumping ? jumpForce : 0) : 0) )) / mass;
 
         speed.x =  acceleration.x * Time.deltaTime * movementSpeed + inertiaFactor * speed.x; // simule une certaine inertie  
         speed.y = acceleration.y * Time.deltaTime; 
@@ -59,7 +63,10 @@ public class InputController1 : MonoBehaviour
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
-        {   timeOnFloor += Time.deltaTime;  }
+        {   
+            timeOnFloor += Time.deltaTime;
+            canDash = true;
+        }
         else
         {   
             timeOnFloor = 0;
@@ -75,6 +82,11 @@ public class InputController1 : MonoBehaviour
             StartCoroutine("DoubleJumpCoroutine");
         }
 
+        if(dash && !dashing && canDash) // && !touchingFloor ?    Le joueur peut dash au sol ou dans les airs une fois, le saut permet de dash à nouveau
+        {
+            StartCoroutine("DashCoroutine");
+        }
+
         //Gestion des collisions et du déplacement//
         if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur    /!\ TODO : Mathf.Abs(speed.x) * Time.deltaTime) à affiner
             position.x += speed.x * Time.deltaTime;  //horitontal movement
@@ -88,6 +100,7 @@ public class InputController1 : MonoBehaviour
         inputs = new Vector2(Input.GetAxis("Horizontal"), 0f);
         jump = Input.GetButton("Jump");
         sprint = Input.GetButton("Sprint");
+        dash = Input.GetButton("Dash");
     }
 
     private bool CheckCollisions(Collider2D moveCollider, Vector2 direction, float distance)
@@ -113,6 +126,7 @@ public class InputController1 : MonoBehaviour
     private IEnumerator JumpCoroutine()
     {
         jumping = true;
+        canDash = true;
         yield return new WaitForSeconds(airTime);
         jumping = false;
         canDoubleJump = true;
@@ -123,8 +137,19 @@ public class InputController1 : MonoBehaviour
     private IEnumerator DoubleJumpCoroutine()
     {
         jumping = true;
+        canDash = true;
         canDoubleJump = false;
         yield return new WaitForSeconds(airTime);
         jumping = false;
+    }
+
+    private IEnumerator DashCoroutine()     
+    {
+        float dashDirection = Mathf.Sign(speed.x);
+        dashForce = dashDirection * Mathf.Abs(dashForce);
+        dashing = true;
+        canDash = false;
+        yield return new WaitForSeconds(0.1f);
+        dashing = false;
     }
 }
