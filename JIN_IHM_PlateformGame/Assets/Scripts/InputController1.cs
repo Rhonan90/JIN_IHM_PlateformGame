@@ -22,7 +22,7 @@ public class InputController1 : MonoBehaviour
     private float timeOnFloor = 0;
     private float timeAfterFirstJump = -1000;
 
-    public float movementSpeed = 20;        //Vitesse du joueur
+    public float movementAcceleration = 20;        //Vitesse du joueur
     public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
     public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
     public float mass = 20;                 //Masse du joueur
@@ -48,9 +48,9 @@ public class InputController1 : MonoBehaviour
     {
         getInput();
 
-        acceleration = (inputs + new Vector2((dashing ? dashForce : 0), (!dashing ? customGravity + (jumping ? jumpForce : 0) : 0) )) / mass;
+        acceleration = (inputs + new Vector2((dashing ? dashForce : 0), (!dashing ?  (jumping ? jumpForce : customGravity) : 0) )) / mass;
 
-        speed.x =  acceleration.x * Time.deltaTime * movementSpeed + inertiaFactor * speed.x; // simule une certaine inertie  
+        speed.x =  acceleration.x * Time.deltaTime * movementAcceleration + inertiaFactor * speed.x; // simule une certaine inertie  
         speed.y = acceleration.y * Time.deltaTime; 
 
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
