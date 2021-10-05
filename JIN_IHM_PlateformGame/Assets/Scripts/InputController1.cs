@@ -98,7 +98,7 @@ public class InputController1 : MonoBehaviour
         {
             StartCoroutine("JumpCoroutine");
         }
-        else if (jump && touchingWall && !touchingFloor && ( (Mathf.Sign(speed.x)==-1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight) )  ) // ptetre à rajouter direction == vers le mur
+        else if (jump && touchingWall && !touchingFloor && ((Mathf.Sign(speed.x) == -1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight))) // ptetre à rajouter direction == vers le mur
         {
             IEnumerator WallJump = WallJumpCoroutine(Mathf.Sign(speed.x));
             StartCoroutine(WallJump);
@@ -113,7 +113,6 @@ public class InputController1 : MonoBehaviour
             StartCoroutine("DashCoroutine");
         }
 
-        //if (toucheMur + !touchingdown + direction == mur)
 
 
         //Gestion des collisions et du déplacement//
