@@ -759,6 +759,7 @@ MonoBehaviour:
   dashForce: 4000
   dashDuration: 0.2
   customGravity: -1800
+  wallResistance: 3
   airTime: 0.3
   airSpeedMultiplier: 0.8
   timeBeforeRejumpInAir: 0

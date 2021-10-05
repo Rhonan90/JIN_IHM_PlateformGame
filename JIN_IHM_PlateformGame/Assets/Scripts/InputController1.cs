@@ -39,6 +39,7 @@ public class InputController1 : MonoBehaviour
     public float dashForce = 10;            //Force/vitesse du dash
     public float dashDuration = 0.2f;            //Durée du dash
     public float customGravity = -10;       //Force de gravite
+    public float wallResistance = 1.4f;
     public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
     public float airSpeedMultiplier = 0.5f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
     public float timeBeforeRejumpInAir = 0f;         //Temps avant de pouvoir resauter en l'air
@@ -76,6 +77,8 @@ public class InputController1 : MonoBehaviour
        
         if (touchingFloor) 
             speed.y = 0;
+        if (touchingWall && Mathf.Sign(speed.y)==-1)
+            speed.y /= wallResistance;
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
