@@ -742,15 +742,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 169f6115f890fda4fbc54d52e384cc84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 60
+  movementAcceleration: 200
   maxMovementSpeed: 12
   inertiaFactor: 0.9
   mass: 1
   jumpForce: 1700
-  dashForce: 1600
+  dashForce: 3000
   dashDuration: 0.2
-  customGravity: -700
-  airTime: 0.3
+  customGravity: -1800
+  airTime: 0.4
   timeBeforeRejumpInAir: 0.1
   timeBeforeRejumpOnFloor: 0.2
   sprintVelocityModifier: 1.2
