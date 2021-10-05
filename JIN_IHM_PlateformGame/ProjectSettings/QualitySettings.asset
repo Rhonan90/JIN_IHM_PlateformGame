@@ -221,7 +221,10 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Standalone
+    - Windows Store Apps
+    - Android
   m_PerPlatformDefaultQuality:
     Android: 2
     Lumin: 5

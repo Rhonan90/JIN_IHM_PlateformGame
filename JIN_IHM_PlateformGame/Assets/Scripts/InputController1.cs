@@ -11,6 +11,8 @@ public class InputController1 : MonoBehaviour
     private Vector2 acceleration;
     private Vector2 inputs;
 
+    public int target = 150;
+
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
@@ -42,10 +44,15 @@ public class InputController1 : MonoBehaviour
         position = transform.position;
         collider2d = transform.GetComponent<Collider2D>();
         speed = new Vector2();
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = target;
     }
 
     private void Update()
     {
+        if (Application.targetFrameRate != target)
+            Application.targetFrameRate = target;
+
         getInput();
 
         acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : 0), (!dashing ?  (jumping ? jumpForce : customGravity) : 0) )) ;
