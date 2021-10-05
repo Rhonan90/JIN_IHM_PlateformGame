@@ -84,10 +84,13 @@ public class InputController1 : MonoBehaviour
         }
 
         //Gestion des collisions et du déplacement//
-        if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime))  //test pour vérifier qu'on entre pas dans un mur    /!\ TODO : Mathf.Abs(speed.x) * Time.deltaTime) à affiner
+        if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime) //test pour vérifier qu'on entre pas dans un mur sur les côtés
+            && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Abs(Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y)) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans un mur en diagonale
             position.x += speed.x * Time.deltaTime;  //horitontal movement
         if (!CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans le sol ou le plafond    /!\ TODO : Mathf.Abs(speed.y) * Time.deltaTime) à affiner
             position.y += speed.y * Time.deltaTime;  //vertical movement
+
+
         transform.position = position;  //update position
     }
 
