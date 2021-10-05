@@ -5,6 +5,9 @@ using UnityEngine;
 public class InputController1 : MonoBehaviour
 {
     private Collider2D collider2d;
+    public ParticleSystem jumpEffect;
+    public ParticleSystem rightWallFrictionEffect;
+    public ParticleSystem leftWallFrictionEffect;
 
     private Vector2 position;
     private Vector2 speed;
@@ -77,8 +80,21 @@ public class InputController1 : MonoBehaviour
        
         if (touchingFloor) 
             speed.y = 0;
-        if (touchingWall && Mathf.Sign(speed.y)==-1)
+        if (touchingWall && Mathf.Sign(speed.y) == -1)
+        {
             speed.y /= wallResistance;
+            if (Mathf.Sign(speed.x)==-1)
+            {
+                leftWallFrictionEffect.gameObject.SetActive(true);
+            }
+            else if (Mathf.Sign(speed.x) == 1 )
+                rightWallFrictionEffect.gameObject.SetActive(true);      
+        }
+        else
+        {
+            rightWallFrictionEffect.gameObject.SetActive(false);
+            leftWallFrictionEffect.gameObject.SetActive(false);
+        }
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
@@ -86,7 +102,7 @@ public class InputController1 : MonoBehaviour
             timeOnFloor += Time.deltaTime;
             canDash = true;
             wallJumpedFromLeft = false;
-            wallJumpedFromRight = false;
+            wallJumpedFromRight = false; 
         }
         else
         {   
@@ -157,6 +173,7 @@ public class InputController1 : MonoBehaviour
     {
         jumping = true;
         canDash = true;
+        jumpEffect.Play();
         yield return new WaitForSeconds(airTime);
         jumping = false;
         canDoubleJump = true;
@@ -168,6 +185,7 @@ public class InputController1 : MonoBehaviour
     {
         jumping = true;
         canDoubleJump = false;
+        jumpEffect.Play();
         yield return new WaitForSeconds(airTime);
         canDash = true;
         jumping = false;
