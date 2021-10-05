@@ -56,6 +56,7 @@ public class InputController1 : MonoBehaviour
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
 
         touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
+        if (touchingFloor) speed.y = 0;
 
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
@@ -85,7 +86,7 @@ public class InputController1 : MonoBehaviour
 
         //Gestion des collisions et du déplacement//
         if (!CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime) //test pour vérifier qu'on entre pas dans un mur sur les côtés
-            && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Abs(Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y)) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans un mur en diagonale
+            && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y) * Time.deltaTime) ) //test pour vérifier qu'on entre pas dans un mur en diagonale
             position.x += speed.x * Time.deltaTime;  //horitontal movement
         if (!CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) //test pour vérifier qu'on entre pas dans le sol ou le plafond    /!\ TODO : Mathf.Abs(speed.y) * Time.deltaTime) à affiner
             position.y += speed.y * Time.deltaTime;  //vertical movement
