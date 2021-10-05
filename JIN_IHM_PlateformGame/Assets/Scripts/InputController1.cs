@@ -31,8 +31,8 @@ public class InputController1 : MonoBehaviour
     public float dashDuration = 0.2f;            //Durée du dash
     public float customGravity = -10;       //Force de gravite
     public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
-    public float timeBeforeRejumpInAir = 0.2f;         //Temps avant de pouvoir resauter en l'air
-    public float timeBeforeRejumpOnFloor = 0.2f;       //Temps avant de pouvoir resauter au sol                                                   
+    public float timeBeforeRejumpInAir = 0f;         //Temps avant de pouvoir resauter en l'air
+    public float timeBeforeRejumpOnFloor = 0f;       //Temps avant de pouvoir resauter au sol                                                   
     public float sprintVelocityModifier = 1.2f;   //Multiplicateur de vitesse en sprintant
     public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
 
@@ -48,17 +48,12 @@ public class InputController1 : MonoBehaviour
     {
         getInput();
 
-        acceleration = (inputs + new Vector2((dashing ? dashForce : 0), (!dashing ?  (jumping ? jumpForce : customGravity) : 0) )) / mass;
+        acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : 0), (!dashing ?  (jumping ? jumpForce : customGravity) : 0) )) ;
 
         speed.x =  acceleration.x * Time.deltaTime * movementAcceleration + inertiaFactor * speed.x; // simule une certaine inertie  
         speed.y = acceleration.y * Time.deltaTime; 
 
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
-
-        if (sprint && !sprint)  //désactivé pour l'instant
-        {
-            speed.x *= sprintVelocityModifier;  //TODO : fix
-        }
 
         touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)) ; //test si on touche le sol
 
@@ -78,7 +73,7 @@ public class InputController1 : MonoBehaviour
         {
             StartCoroutine("JumpCoroutine");
         }
-        else if (jump && !touchingFloor && !jumping && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir)
+        else if (jump && !touchingFloor && !jumping && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir) 
         {
             StartCoroutine("DoubleJumpCoroutine");
         }
@@ -99,7 +94,7 @@ public class InputController1 : MonoBehaviour
     private void getInput()
     {
         inputs = new Vector2(Input.GetAxis("Horizontal"), 0f);
-        jump = Input.GetButton("Jump");
+        jump = Input.GetButtonDown("Jump");
         sprint = Input.GetButton("Sprint");
         dash = Input.GetButton("Dash");
     }
@@ -138,9 +133,9 @@ public class InputController1 : MonoBehaviour
     private IEnumerator DoubleJumpCoroutine()
     {
         jumping = true;
-        canDash = true;
         canDoubleJump = false;
         yield return new WaitForSeconds(airTime);
+        canDash = true;
         jumping = false;
     }
 
