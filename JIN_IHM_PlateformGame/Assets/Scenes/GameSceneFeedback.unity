@@ -10557,12 +10557,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7905766681907340839, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
   m_PrefabInstance: {fileID: 1246778258}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1471226571 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7905766681907340836, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
-  m_PrefabInstance: {fileID: 1246778258}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1471226572
+--- !u!114 &1471226567
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10571,15 +10566,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1471226566}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 169f6115f890fda4fbc54d52e384cc84, type: 3}
+  m_Script: {fileID: 11500000, guid: 09b11d2cd76fa1d4dbb2c4f0662191c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  jumpEffect: {fileID: 1407165132}
+  rightWallFrictionEffect: {fileID: 1581291098}
+  leftWallFrictionEffect: {fileID: 572380706}
   target: 150
   movementAcceleration: 200
   maxMovementSpeed: 20
   inertiaFactor: 0.9
   mass: 1
-  jumpForce: 1700
+  jumpForce: 1200
   wallJumpForce: 3000
   wallJumpDuration: 0.2
   dashForce: 4000
@@ -10592,6 +10590,11 @@ MonoBehaviour:
   timeBeforeRejumpOnFloor: 0
   sprintVelocityModifier: 2
   sprintJumpModifier: 1.2
+--- !u!4 &1471226571 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7905766681907340836, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+  m_PrefabInstance: {fileID: 1246778258}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1581291095
 GameObject:
   m_ObjectHideFlags: 0
