@@ -31,23 +31,24 @@ public class InputControllerAnimated : MonoBehaviour
     private bool wallJumpedFromLeft = false;
     private float timeOnFloor = 0;
     private float timeAfterFirstJump = -1000;
+    private float minSpeedThreshold = 0.001f;  //Vitesse minimale
 
-    public float movementAcceleration = 20;        //Vitesse du joueur
-    public float maxMovementSpeed = 10;     //Vitesse maximale du joueur
+    public float movementAcceleration = 200;        //Vitesse du joueur
+    public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
     public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
-    public float mass = 20;                 //Masse du joueur
-    public float jumpForce = 10 ;           //Force du saut
-    public float wallJumpForce = 10;           //Force du saut au mur
+    public float mass = 1;                 //Masse du joueur
+    public float jumpForce = 1200 ;           //Force du saut
+    public float wallJumpForce = 3000;           //Force du saut au mur
     public float wallJumpDuration = 0.2f;     //Durée du saut au mur
-    public float dashForce = 10;            //Force/vitesse du dash
+    public float dashForce = 4000;            //Force/vitesse du dash
     public float dashDuration = 0.2f;            //Durée du dash
-    public float customGravity = -10;       //Force de gravite
-    public float wallResistance = 1.4f;
-    public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
-    public float airSpeedMultiplier = 0.5f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
+    public float customGravity = -1800;       //Force de gravite
+    public float wallResistance = 3f;
+    public float airTime = 0.3f;            //Temps en maximum de saut (nuancier)
+    public float airSpeedMultiplier = 0.8f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
     public float timeBeforeRejumpInAir = 0f;         //Temps avant de pouvoir resauter en l'air
     public float timeBeforeRejumpOnFloor = 0f;       //Temps avant de pouvoir resauter au sol                                                   
-    public float sprintVelocityModifier = 1.2f;   //Multiplicateur de vitesse en sprintant
+    public float sprintVelocityModifier = 2f;   //Multiplicateur de vitesse en sprintant
     public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
 
 
@@ -75,6 +76,9 @@ public class InputControllerAnimated : MonoBehaviour
         touchingWall = (CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime)); //test si on touche le sol
 
         speed.x =  acceleration.x * Time.deltaTime * movementAcceleration * (!touchingFloor ? airSpeedMultiplier : 1)  + inertiaFactor * speed.x; // simule une certaine inertie  
+        
+        if (Mathf.Abs(speed.x) < minSpeedThreshold)
+            speed.x = 0;
 
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
        
