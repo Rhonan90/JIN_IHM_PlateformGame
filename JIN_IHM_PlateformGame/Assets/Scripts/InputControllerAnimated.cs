@@ -8,6 +8,8 @@ public class InputControllerAnimated : MonoBehaviour
     public ParticleSystem jumpEffect;
     public ParticleSystem rightWallFrictionEffect;
     public ParticleSystem leftWallFrictionEffect;
+    public TrailRenderer leftDashTrail;
+    public TrailRenderer rightDashTrail;
 
     private Vector2 position;
     private Vector2 speed;
@@ -123,7 +125,7 @@ public class InputControllerAnimated : MonoBehaviour
             IEnumerator WallJump = WallJumpCoroutine(Mathf.Sign(speed.x));
             StartCoroutine(WallJump);
         }
-        else if (jump && !touchingFloor && !jumping && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir) 
+        else if (jump && !touchingFloor && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir) 
         {
             StartCoroutine("DoubleJumpCoroutine");
         }
@@ -198,9 +200,11 @@ public class InputControllerAnimated : MonoBehaviour
     private IEnumerator DashCoroutine()     
     {
         float dashDirection = Mathf.Sign(speed.x);
+        TrailRenderer trail = (dashDirection == 1 ? leftDashTrail : rightDashTrail);
         dashForce = dashDirection * Mathf.Abs(dashForce);
         dashing = true;
         canDash = false;
+        trail.time = Mathf.Lerp(0.2f, 0, dashDuration);  //TO FIX
         yield return new WaitForSeconds(dashDuration);
         dashing = false;
     }
