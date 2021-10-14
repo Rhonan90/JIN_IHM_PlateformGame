@@ -6,6 +6,9 @@ public class InputControllerAnimated : MonoBehaviour
 {
     private Collider2D collider2d;
     public ParticleSystem jumpEffect;
+    public ParticleSystem doubleJumpEffect;
+    public ParticleSystem leftWallJumpEffect;
+    public ParticleSystem rightWallJumpEffect;
     public ParticleSystem rightWallFrictionEffect;
     public ParticleSystem leftWallFrictionEffect;
     public TrailRenderer leftDashTrail;
@@ -34,6 +37,7 @@ public class InputControllerAnimated : MonoBehaviour
     private float timeOnFloor = 0;
     private float timeAfterFirstJump = -1000;
     private float minSpeedThreshold = 0.001f;  //Vitesse minimale
+    private float timeDashing;
 
     public float movementAcceleration = 200;        //Vitesse du joueur
     public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
@@ -102,6 +106,9 @@ public class InputControllerAnimated : MonoBehaviour
             leftWallFrictionEffect.gameObject.SetActive(false);
         }
 
+        if (dashing)
+            timeDashing += Time.deltaTime;
+
         //Gestion du saut et de la chute//
         if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
         {   
@@ -136,7 +143,6 @@ public class InputControllerAnimated : MonoBehaviour
         }
 
 
-
         //Gestion des collisions et du déplacement//
         if (!touchingWall && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y) * Time.deltaTime) ) //test pour vérifier qu'on entre pas dans un mur en diagonale
             position.x += speed.x * Time.deltaTime;  //horitontal movement
@@ -168,6 +174,10 @@ public class InputControllerAnimated : MonoBehaviour
             {
                 if (!hits[i].collider.isTrigger)
                 {
+                    if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe à travers les sols gris sauf en descendant
+                    {
+                        return false;
+                    }
                     return true;
                 }
             }
@@ -191,7 +201,7 @@ public class InputControllerAnimated : MonoBehaviour
     {
         jumping = true;
         canDoubleJump = false;
-        jumpEffect.Play();
+        doubleJumpEffect.Play();
         yield return new WaitForSeconds(airTime);
         canDash = true;
         jumping = false;
@@ -204,17 +214,24 @@ public class InputControllerAnimated : MonoBehaviour
         dashForce = dashDirection * Mathf.Abs(dashForce);
         dashing = true;
         canDash = false;
-        trail.time = Mathf.Lerp(0.2f, 0, dashDuration);  //TO FIX
-        yield return new WaitForSeconds(dashDuration);
+        timeDashing = 0;
+        trail.emitting = true;
+        while (timeDashing < dashDuration)
+        {
+            trail.time = Mathf.Lerp(0.2f, 0, dashDuration - timeDashing);
+            yield return null;
+        }
         dashing = false;
+        trail.emitting = false;
+        trail.time = 0;
     }
 
     private IEnumerator WallJumpCoroutine(float wallDirection)  //wallDirection:1 == le mur de droite , -1 == le mur de gauche
     {
         wallJumpDirection = -wallDirection;
         wallJumping = true;
-        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; }
-        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; }
+        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); }
+        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); }
         yield return new WaitForSeconds(wallJumpDuration);
         wallJumping = false;
     }
