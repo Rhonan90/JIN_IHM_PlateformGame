@@ -13,6 +13,7 @@ public class InputControllerAnimated : MonoBehaviour
     public ParticleSystem leftWallFrictionEffect;
     public TrailRenderer leftDashTrail;
     public TrailRenderer rightDashTrail;
+    public Animator playerAnimator;
 
     private Vector2 position;
     private Vector2 speed;
@@ -87,21 +88,31 @@ public class InputControllerAnimated : MonoBehaviour
             speed.x = 0;
 
         speed.x = Mathf.Clamp(speed.x, -maxMovementSpeed, maxMovementSpeed);  // on limite la vitesse maximale du joueur
-       
-        if (touchingFloor) 
+
+        if (touchingFloor)
+        {
             speed.y = 0;
+            playerAnimator.SetBool("OnFloor", true);
+        }
+        else
+            playerAnimator.SetBool("OnFloor", false);
+
         if (touchingWall && Mathf.Sign(speed.y) == -1)
         {
             speed.y /= wallResistance;
-            if (Mathf.Sign(speed.x)==-1)
+            playerAnimator.SetTrigger("Sliding");
+            if (Mathf.Sign(speed.x) == -1)
             {
                 leftWallFrictionEffect.gameObject.SetActive(true);
             }
-            else if (Mathf.Sign(speed.x) == 1 )
-                rightWallFrictionEffect.gameObject.SetActive(true);      
+            else if (Mathf.Sign(speed.x) == 1)
+            {
+                rightWallFrictionEffect.gameObject.SetActive(true);
+            }
         }
         else
         {
+            playerAnimator.SetTrigger("NotSliding");
             rightWallFrictionEffect.gameObject.SetActive(false);
             leftWallFrictionEffect.gameObject.SetActive(false);
         }
@@ -190,6 +201,7 @@ public class InputControllerAnimated : MonoBehaviour
         jumping = true;
         canDash = true;
         jumpEffect.Play();
+        playerAnimator.SetTrigger("Jumping");
         yield return new WaitForSeconds(airTime);
         jumping = false;
         canDoubleJump = true;
@@ -202,6 +214,7 @@ public class InputControllerAnimated : MonoBehaviour
         jumping = true;
         canDoubleJump = false;
         doubleJumpEffect.Play();
+        playerAnimator.SetTrigger("DoubleJumping");
         yield return new WaitForSeconds(airTime);
         canDash = true;
         jumping = false;
@@ -216,9 +229,10 @@ public class InputControllerAnimated : MonoBehaviour
         canDash = false;
         timeDashing = 0;
         trail.emitting = true;
+        playerAnimator.SetTrigger("Dashing");
         while (timeDashing < dashDuration)
         {
-            trail.time = Mathf.Lerp(0.2f, 0, dashDuration - timeDashing);
+            trail.time = 1;
             yield return null;
         }
         dashing = false;
