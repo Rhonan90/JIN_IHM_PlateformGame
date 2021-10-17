@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
+[CustomEditor(typeof(InputControllerAnimated))]
+[CanEditMultipleObjects]
 public class InputControllerAnimated : MonoBehaviour
 {
-    private Collider2D collider2d;
+
+    [Header("External references (do not modify)")]
     public ParticleSystem jumpEffect;
     public ParticleSystem doubleJumpEffect;
     public ParticleSystem leftWallJumpEffect;
@@ -14,12 +18,17 @@ public class InputControllerAnimated : MonoBehaviour
     public TrailRenderer leftDashTrail;
     public TrailRenderer rightDashTrail;
     public Animator playerAnimator;
+    private Collider2D collider2d;
 
     private Vector2 position;
     private Vector2 speed;
     private Vector2 acceleration;
     private Vector2 inputs;
 
+    [Space(10)]
+    [Header("FPS target")]
+    [Range(60, 200)]
+    [Tooltip("150 is good, indeed fps affects gameSpeed so try not to change it too much (below 120)")]
     public int target = 150;
 
     private bool sprint = false;
@@ -40,10 +49,15 @@ public class InputControllerAnimated : MonoBehaviour
     private float minSpeedThreshold = 0.001f;  //Vitesse minimale
     private float timeDashing;
 
+    [Space(10)]
+    [Header("Player caracteristics")]
     public float movementAcceleration = 200;        //Vitesse du joueur
     public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
     public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
     public float mass = 1;                 //Masse du joueur
+
+    [Space(10)]
+    [Header("Special Actions Values")]
     public float jumpForce = 1200 ;           //Force du saut
     public float wallJumpForce = 3000;           //Force du saut au mur
     public float wallJumpDuration = 0.2f;     //Durée du saut au mur
