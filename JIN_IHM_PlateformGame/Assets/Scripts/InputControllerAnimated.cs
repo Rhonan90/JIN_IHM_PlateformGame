@@ -60,13 +60,14 @@ public class InputControllerAnimated : MonoBehaviour
     [Space(10)]
     [Header("Special Actions Values")]
     public float jumpForce = 1200 ;           //Force du saut
+    public float airTime = 0.3f;            //Temps en maximum de saut (nuancier)
+    public float doubleJumpMultiplier = 2;
     public float wallJumpForce = 3000;           //Force du saut au mur
     public float wallJumpDuration = 0.2f;     //Dur�e du saut au mur
     public float dashForce = 4000;            //Force/vitesse du dash
     public float dashDuration = 0.2f;            //Dur�e du dash
     public float customGravity = -1800;       //Force de gravite
     public float wallResistance = 3f;
-    public float airTime = 0.3f;            //Temps en maximum de saut (nuancier)
     public float airSpeedMultiplier = 0.8f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
     public float timeBeforeRejumpInAir = 0f;         //Temps avant de pouvoir resauter en l'air
     public float timeBeforeRejumpOnFloor = 0f;       //Temps avant de pouvoir resauter au sol                                                   
@@ -100,9 +101,11 @@ public class InputControllerAnimated : MonoBehaviour
         if (ControlsActivated)
             getInput();
 
-        acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), (dashing ?  0 : (jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )))) ;
+        acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )) ;
 
         speed.y += acceleration.y * Time.deltaTime;
+        if (dashing)
+            speed.y = 0;
 
         touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)); //test si on touche le sol
         touchingWall = (CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime)); //test si on touche le sol
@@ -255,9 +258,10 @@ public class InputControllerAnimated : MonoBehaviour
         SFX[1].Play();
         jumping = true;
         canDoubleJump = false;
+        speed.y = 0;
         doubleJumpEffect.Play();
         playerAnimator.SetTrigger("DoubleJumping");
-        yield return new WaitForSeconds(airTime);
+        yield return new WaitForSeconds(airTime * doubleJumpMultiplier);
         canDash = true;
         jumping = false;
     }
