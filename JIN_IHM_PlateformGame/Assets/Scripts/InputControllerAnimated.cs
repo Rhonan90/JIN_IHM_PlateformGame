@@ -31,6 +31,7 @@ public class InputControllerAnimated : MonoBehaviour
     [Tooltip("150 is good, indeed fps affects gameSpeed so try not to change it too much (below 120)")]
     public int target = 150;
 
+    private AudioSource[] SFX;
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
@@ -60,9 +61,9 @@ public class InputControllerAnimated : MonoBehaviour
     [Header("Special Actions Values")]
     public float jumpForce = 1200 ;           //Force du saut
     public float wallJumpForce = 3000;           //Force du saut au mur
-    public float wallJumpDuration = 0.2f;     //Durée du saut au mur
+    public float wallJumpDuration = 0.2f;     //Durï¿½e du saut au mur
     public float dashForce = 4000;            //Force/vitesse du dash
-    public float dashDuration = 0.2f;            //Durée du dash
+    public float dashDuration = 0.2f;            //Durï¿½e du dash
     public float customGravity = -1800;       //Force de gravite
     public float wallResistance = 3f;
     public float airTime = 0.3f;            //Temps en maximum de saut (nuancier)
@@ -87,6 +88,8 @@ public class InputControllerAnimated : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = target;
         respawnPoint = GameObject.Find("RespawnPoint").transform;
+        SFX = GameObject.Find("SFX").GetComponents<AudioSource>();
+
     }
 
     private void Update()
@@ -126,14 +129,24 @@ public class InputControllerAnimated : MonoBehaviour
             if (Mathf.Sign(speed.x) == -1)
             {
                 leftWallFrictionEffect.gameObject.SetActive(true);
+                if (!SFX[3].isPlaying)
+                {
+                    SFX[3].Play();
+                }
             }
             else if (Mathf.Sign(speed.x) == 1)
             {
                 rightWallFrictionEffect.gameObject.SetActive(true);
+                if (!SFX[2].isPlaying)
+                {
+                    SFX[2].Play();
+                }
             }
         }
         else
         {
+            SFX[2].Stop();
+            SFX[3].Stop();
             playerAnimator.SetTrigger("NotSliding");
             rightWallFrictionEffect.gameObject.SetActive(false);
             leftWallFrictionEffect.gameObject.SetActive(false);
@@ -143,7 +156,7 @@ public class InputControllerAnimated : MonoBehaviour
             timeDashing += Time.deltaTime;
 
         //Gestion du saut et de la chute//
-        if (touchingFloor) //Incremente temps passé depuis l'appui de la touche de saut (0 si au sol)
+        if (touchingFloor) //Incremente temps passï¿½ depuis l'appui de la touche de saut (0 si au sol)
         {   
             timeOnFloor += Time.deltaTime;
             canDash = true;
@@ -160,7 +173,7 @@ public class InputControllerAnimated : MonoBehaviour
         {
             StartCoroutine("JumpCoroutine");
         }
-        else if (jump && touchingWall && !touchingFloor && WallJumpActivated && ((Mathf.Sign(speed.x) == -1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight))) // ptetre à rajouter direction == vers le mur
+        else if (jump && touchingWall && !touchingFloor && WallJumpActivated && ((Mathf.Sign(speed.x) == -1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight))) // ptetre ï¿½ rajouter direction == vers le mur
         {
             IEnumerator WallJump = WallJumpCoroutine(Mathf.Sign(speed.x));
             StartCoroutine(WallJump);
@@ -170,16 +183,16 @@ public class InputControllerAnimated : MonoBehaviour
             StartCoroutine("DoubleJumpCoroutine");
         }
 
-        if(dash && !dashing && canDash && !touchingFloor) //Le joueur peut dash dans les airs une fois, le saut permet de dash à nouveau
+        if(dash && !dashing && canDash && !touchingFloor) //Le joueur peut dash dans les airs une fois, le saut permet de dash ï¿½ nouveau
         {
             StartCoroutine("DashCoroutine");
         }
 
 
-        //Gestion des collisions et du déplacement//
-        if (!touchingWall && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y) * Time.deltaTime) ) //test pour vérifier qu'on entre pas dans un mur en diagonale
+        //Gestion des collisions et du dï¿½placement//
+        if (!touchingWall && !CheckCollisions(collider2d, new Vector2(speed.x, speed.y).normalized, Mathf.Sqrt(speed.x*speed.x+speed.y*speed.y) * Time.deltaTime) ) //test pour vï¿½rifier qu'on entre pas dans un mur en diagonale
             position.x += speed.x * Time.deltaTime;  //horitontal movement
-        if (!touchingFloor) //test pour vérifier qu'on entre pas dans le sol ou le plafond    /!\ TODO : Mathf.Abs(speed.y) * Time.deltaTime) à affiner
+        if (!touchingFloor) //test pour vï¿½rifier qu'on entre pas dans le sol ou le plafond    /!\ TODO : Mathf.Abs(speed.y) * Time.deltaTime) ï¿½ affiner
             position.y += speed.y * Time.deltaTime;  //vertical movement
 
 
@@ -212,7 +225,7 @@ public class InputControllerAnimated : MonoBehaviour
                 }
                 if (!hits[i].collider.isTrigger)
                 {
-                    if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe à travers les sols gris sauf en descendant
+                    if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe ï¿½ travers les sols gris sauf en descendant
                     {
                         return false;
                     }
@@ -225,6 +238,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator JumpCoroutine()
     {
+        SFX[0].Play();
         jumping = true;
         canDash = true;
         jumpEffect.Play();
@@ -238,6 +252,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator DoubleJumpCoroutine()
     {
+        SFX[1].Play();
         jumping = true;
         canDoubleJump = false;
         doubleJumpEffect.Play();
@@ -271,8 +286,8 @@ public class InputControllerAnimated : MonoBehaviour
     {
         wallJumpDirection = -wallDirection;
         wallJumping = true;
-        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); }
-        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); }
+        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); SFX[5].Play(); }
+        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); SFX[4].Play(); }
         yield return new WaitForSeconds(wallJumpDuration);
         wallJumping = false;
     }
