@@ -31,6 +31,7 @@ public class InputControllerAnimated : MonoBehaviour
     [Tooltip("150 is good, indeed fps affects gameSpeed so try not to change it too much (below 120)")]
     public int target = 150;
 
+    private AudioSource[] SFX;
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
@@ -80,6 +81,7 @@ public class InputControllerAnimated : MonoBehaviour
         speed = new Vector2();
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = target;
+        SFX = GameObject.Find("SFX").GetComponents<AudioSource>();
     }
 
     private void Update()
@@ -118,14 +120,24 @@ public class InputControllerAnimated : MonoBehaviour
             if (Mathf.Sign(speed.x) == -1)
             {
                 leftWallFrictionEffect.gameObject.SetActive(true);
+                if (!SFX[3].isPlaying)
+                {
+                    SFX[3].Play();
+                }
             }
             else if (Mathf.Sign(speed.x) == 1)
             {
                 rightWallFrictionEffect.gameObject.SetActive(true);
+                if (!SFX[2].isPlaying)
+                {
+                    SFX[2].Play();
+                }
             }
         }
         else
         {
+            SFX[2].Stop();
+            SFX[3].Stop();
             playerAnimator.SetTrigger("NotSliding");
             rightWallFrictionEffect.gameObject.SetActive(false);
             leftWallFrictionEffect.gameObject.SetActive(false);
@@ -212,6 +224,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator JumpCoroutine()
     {
+        SFX[0].Play();
         jumping = true;
         canDash = true;
         jumpEffect.Play();
@@ -225,6 +238,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator DoubleJumpCoroutine()
     {
+        SFX[1].Play();
         jumping = true;
         canDoubleJump = false;
         doubleJumpEffect.Play();
@@ -258,8 +272,8 @@ public class InputControllerAnimated : MonoBehaviour
     {
         wallJumpDirection = -wallDirection;
         wallJumping = true;
-        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); }
-        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); }
+        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); SFX[5].Play(); }
+        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); SFX[4].Play(); }
         yield return new WaitForSeconds(wallJumpDuration);
         wallJumping = false;
     }
