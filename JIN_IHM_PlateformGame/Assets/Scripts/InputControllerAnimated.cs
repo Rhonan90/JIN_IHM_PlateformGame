@@ -72,6 +72,12 @@ public class InputControllerAnimated : MonoBehaviour
     public float sprintVelocityModifier = 2f;   //Multiplicateur de vitesse en sprintant
     public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
 
+    //Game Management
+    private bool ControlsActivated = true;
+    private bool JumpActivated = true;
+    private bool DoubleJumpActivated = true;
+    private bool WallJumpActivated = true;
+    private Transform respawnPoint;
 
     private void Awake()
     {
@@ -80,6 +86,7 @@ public class InputControllerAnimated : MonoBehaviour
         speed = new Vector2();
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = target;
+        respawnPoint = GameObject.Find("RespawnPoint").transform;
     }
 
     private void Update()
@@ -87,17 +94,18 @@ public class InputControllerAnimated : MonoBehaviour
         if (Application.targetFrameRate != target)
             Application.targetFrameRate = target;
 
-        getInput();
+        if (ControlsActivated)
+            getInput();
 
         acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), (dashing ?  0 : (jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )))) ;
 
-        speed.y = acceleration.y * Time.deltaTime;
+        speed.y += acceleration.y * Time.deltaTime;
 
         touchingFloor = (CheckCollisions(collider2d, new Vector2(0, speed.y).normalized, Mathf.Abs(speed.y) * Time.deltaTime)); //test si on touche le sol
         touchingWall = (CheckCollisions(collider2d, new Vector2(speed.x, 0).normalized, Mathf.Abs(speed.x) * Time.deltaTime)); //test si on touche le sol
 
-        speed.x =  acceleration.x * Time.deltaTime * movementAcceleration * (!touchingFloor ? airSpeedMultiplier : 1)  + inertiaFactor * speed.x; // simule une certaine inertie  
-        
+        speed.x =  acceleration.x * Time.deltaTime * movementAcceleration * (!touchingFloor ? airSpeedMultiplier : 1) + inertiaFactor * speed.x; // simule une certaine inertie  + inertiaFactor * speed.x
+
         if (Mathf.Abs(speed.x) < minSpeedThreshold)
             speed.x = 0;
 
@@ -148,16 +156,16 @@ public class InputControllerAnimated : MonoBehaviour
             timeAfterFirstJump += Time.deltaTime;
         }
 
-        if (jump && touchingFloor && !jumping && timeOnFloor > timeBeforeRejumpOnFloor)
+        if (jump && touchingFloor && !jumping && JumpActivated && timeOnFloor > timeBeforeRejumpOnFloor)
         {
             StartCoroutine("JumpCoroutine");
         }
-        else if (jump && touchingWall && !touchingFloor && ((Mathf.Sign(speed.x) == -1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight))) // ptetre à rajouter direction == vers le mur
+        else if (jump && touchingWall && !touchingFloor && WallJumpActivated && ((Mathf.Sign(speed.x) == -1 && !wallJumpedFromLeft) || (Mathf.Sign(speed.x) == 1 && !wallJumpedFromRight))) // ptetre à rajouter direction == vers le mur
         {
             IEnumerator WallJump = WallJumpCoroutine(Mathf.Sign(speed.x));
             StartCoroutine(WallJump);
         }
-        else if (jump && !touchingFloor && canDoubleJump && timeAfterFirstJump > timeBeforeRejumpInAir) 
+        else if (jump && !touchingFloor && canDoubleJump && DoubleJumpActivated && timeAfterFirstJump > timeBeforeRejumpInAir) 
         {
             StartCoroutine("DoubleJumpCoroutine");
         }
@@ -197,6 +205,11 @@ public class InputControllerAnimated : MonoBehaviour
 
             for (int i = 0; i < numHits; i++)
             {
+                if (hits[i].transform.gameObject.CompareTag("Lava"))
+                {
+                    //position = respawnPoint.position;
+                    Debug.Log("lavaaaaaa");
+                }
                 if (!hits[i].collider.isTrigger)
                 {
                     if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe à travers les sols gris sauf en descendant
