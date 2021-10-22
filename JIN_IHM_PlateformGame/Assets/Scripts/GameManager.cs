@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class UiManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    private static UiManager instance;
+    private static GameManager instance;
 
-    public static UiManager Instance { get; private set; }
+    public static GameManager Instance { get; private set; }
 
     private void Awake()
     {
