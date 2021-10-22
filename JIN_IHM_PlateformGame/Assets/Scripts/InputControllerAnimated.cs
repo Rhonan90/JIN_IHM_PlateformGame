@@ -212,6 +212,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private bool CheckCollisions(Collider2D moveCollider, Vector2 direction, float distance)
     {
+        bool colliding;
         if (moveCollider!=null)
         {
             RaycastHit2D[] hits = new RaycastHit2D[10];
