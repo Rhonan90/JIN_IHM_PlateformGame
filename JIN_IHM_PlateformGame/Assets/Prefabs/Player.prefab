@@ -24504,7 +24504,8 @@ MonoBehaviour:
   movementAcceleration: 75
   maxMovementSpeed: 20
   inertiaFactor: 0.96
-  mass: 1
+  customGravity: -150
+  wallResistance: 1.5
   jumpForce: 100
   airTime: 0.2
   doubleJumpMultiplier: 1
@@ -24512,8 +24513,6 @@ MonoBehaviour:
   wallJumpDuration: 0.2
   dashForce: -200
   dashDuration: 0.2
-  customGravity: -150
-  wallResistance: 1.5
   airSpeedMultiplier: 0.7
   timeBeforeRejumpInAir: 0
   timeBeforeRejumpOnFloor: 0

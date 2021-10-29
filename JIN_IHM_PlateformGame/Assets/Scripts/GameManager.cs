@@ -14,21 +14,31 @@ public class GameManager : MonoBehaviour
     public GameObject endLevelCanvas;
     public GameObject pauseCanvas;
     public GameObject eventSystem;
+    public bool feedbacks = true;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        if (instance != null && instance != this)
-            Destroy(gameObject);   
 
-        instance = this;
+        if (instance == null)
+            instance = this;
+
+        if (instance != null)
+            this.currentLevelId = instance.currentLevelId;
+
+        if (instance != null && instance != this)
+        {
+            Destroy(instance.gameObject);
+            instance = this;    
+        }
+        currentLevelId = SceneManager.GetActiveScene().buildIndex;
     }
 
     public void LoadScene(int levelId)
     {
-        currentLevelId = levelId;
         SceneManager.LoadScene(levelId);
-        currentLevelId = SceneManager.GetActiveScene().buildIndex;
+        //currentLevelId = SceneManager.GetActiveScene().buildIndex;
+        currentLevelId = levelId;
     }
 
     public void ReloadScene()
@@ -61,11 +71,26 @@ public class GameManager : MonoBehaviour
     public void GamePausedMenu()
     {
         pauseCanvas.SetActive(true);
-        //Time.timeScale = 0.1f;
+    }
+
+    public void GameUnPaused()
+    {
+        pauseCanvas.SetActive(false);
     }
 
     public int getLevelId()
     {
         return currentLevelId;
+    }
+
+    public void setFeedbacks(bool enabled)
+    {
+        feedbacks = enabled;
+        Debug.Log("switch");
+    }
+
+    public bool getFeedbacks()
+    {
+        return feedbacks;
     }
 }

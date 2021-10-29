@@ -51,31 +51,51 @@ public class InputControllerAnimated : MonoBehaviour
 
     [Space(10)]
     [Header("Player caracteristics")]
-    public float movementAcceleration = 200;        //Vitesse du joueur
+    [Range(50, 100)]
+    public float movementAcceleration = 75;        //Vitesse du joueur
+    [Range(10, 30)]
     public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
-    public float inertiaFactor = 0.9f;     //Facteur inertielle [0,1]
-    public float mass = 1;                 //Masse du joueur
+    [Range(0.9f, 1)]
+    public float inertiaFactor = 0.96f;     //Facteur inertielle [0,1]
+
+    [Space(10)]
+    [Header("World caracteristics")]
+    [Range(-50, -300)]
+    public float customGravity = -150;       //Force de gravite
+    [Range(1, 2)]
+    public float wallResistance = 1.5f;
 
     [Space(10)]
     [Header("Special Actions Values")]
-    public float jumpForce = 1200 ;           //Force du saut
-    public float airTime = 0.3f;            //Temps en maximum de saut (nuancier)
-    public float doubleJumpMultiplier = 2;
-    public float wallJumpForce = 3000;           //Force du saut au mur
+    [Range(50, 150)]
+    public float jumpForce = 100 ;           //Force du saut
+    [Range(0f, 0.4f)]
+    public float airTime = 0.2f;            //Temps en maximum de saut (nuancier)
+    [Range(0.5f, 2)]
+    public float doubleJumpMultiplier = 1;
+    [Range(60, 200)]
+    public float wallJumpForce = 120;           //Force du saut au mur
+    [Range(0f, 0.5f)]
     public float wallJumpDuration = 0.2f;     //Dur�e du saut au mur
-    public float dashForce = 4000;            //Force/vitesse du dash
+    [Range(100, 300)]
+    public float dashForce = 200;            //Force/vitesse du dash
+    [Range(0, 0.4f)]
     public float dashDuration = 0.2f;            //Dur�e du dash
-    public float customGravity = -1800;       //Force de gravite
-    public float wallResistance = 3f;
-    public float airSpeedMultiplier = 0.8f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
+    [Range(0, 1.5f)]
+    public float airSpeedMultiplier = 0.7f;  //Multiplicateur de vitesse du joueur lorsqu'il est en l'air
+    [Range(0, 0.5f)]
     public float timeBeforeRejumpInAir = 0f;         //Temps avant de pouvoir resauter en l'air
-    public float timeBeforeRejumpOnFloor = 0f;       //Temps avant de pouvoir resauter au sol                                                   
-    public float sprintVelocityModifier = 2f;   //Multiplicateur de vitesse en sprintant
+    [Range(0, 0.5f)]
+    public float timeBeforeRejumpOnFloor = 0f;       //Temps avant de pouvoir resauter au sol
+    [Range(0.5f, 2f)]
+    public float sprintVelocityModifier = 1.5f;   //Multiplicateur de vitesse en sprintant
+    [Range(0.5f, 1.5f)]
     public float sprintJumpModifier = 1.2f;       //Multiplicateur de force de saut en srprintant
 
     //Game Management
+    private bool feedbacks=true;
     private bool ControlsActivated = true;
-    private bool JumpActivated = false;
+    private bool JumpActivated = true;
     private bool DoubleJumpActivated = false;
     private bool WallJumpActivated = false;
     private bool DashActivated = false;
@@ -83,6 +103,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private GameManager gameManager;
     private bool gamePaused = false;
+    private bool pause = false;
 
     private void Awake()
     {
@@ -96,23 +117,25 @@ public class InputControllerAnimated : MonoBehaviour
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         int currentLevel = gameManager.getLevelId();
-        if (currentLevel>0)
+        Debug.Log(currentLevel);
+
+        if (currentLevel >1)
         {
-            JumpActivated = true;
-            if (currentLevel >1)
+            WallJumpActivated = true;
+            if (currentLevel > 2)
             {
-                WallJumpActivated = true;
-                if (currentLevel > 2)
+                DoubleJumpActivated = true;
+                if (currentLevel > 3)
                 {
-                    DoubleJumpActivated = true;
-                    if (currentLevel > 3)
-                    {
-                        DashActivated = true;
-                    }
+                    DashActivated = true;
                 }
             }
         }
-}
+        feedbacks = gameManager.getFeedbacks();
+        playerAnimator.enabled = feedbacks;
+
+        Debug.Log(feedbacks);
+    }
 
     private void Update()
     {
@@ -121,6 +144,9 @@ public class InputControllerAnimated : MonoBehaviour
 
         if (ControlsActivated && !gamePaused)
             getInput();
+
+        if (pause)
+            gamePause();
 
         if (respawn)
         {
@@ -158,18 +184,22 @@ public class InputControllerAnimated : MonoBehaviour
             playerAnimator.SetTrigger("Sliding");
             if (Mathf.Sign(speed.x) == -1)
             {
-                leftWallFrictionEffect.gameObject.SetActive(true);
+                if(feedbacks)
+                    leftWallFrictionEffect.gameObject.SetActive(true);
                 if (!SFX[3].isPlaying)
                 {
-                    SFX[3].Play();
+                    if (feedbacks)
+                        SFX[3].Play();
                 }
             }
             else if (Mathf.Sign(speed.x) == 1)
             {
-                rightWallFrictionEffect.gameObject.SetActive(true);
+                if (feedbacks)
+                    rightWallFrictionEffect.gameObject.SetActive(true);
                 if (!SFX[2].isPlaying)
                 {
-                    SFX[2].Play();
+                    if (feedbacks)
+                        SFX[2].Play();
                 }
             }
         }
@@ -236,6 +266,7 @@ public class InputControllerAnimated : MonoBehaviour
         sprint = Input.GetButton("Sprint");
         dash = Input.GetButton("Dash");
         respawn = Input.GetButtonDown("Respawn");
+        pause = Input.GetButtonDown("Pause");
     }
 
     private bool CheckCollisions(Collider2D moveCollider, Vector2 direction, float distance)
@@ -256,7 +287,7 @@ public class InputControllerAnimated : MonoBehaviour
                 }
                 if (hits[i].transform.gameObject.CompareTag("Victory"))
                 {
-                    levelFinished();
+                    LevelFinished();
                 }
                 if (!hits[i].collider.isTrigger)
                 {
@@ -282,10 +313,12 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator JumpCoroutine()
     {
-        SFX[0].Play();
+        if (feedbacks)
+            SFX[0].Play();
         jumping = true;
         canDash = true;
-        jumpEffect.Play();
+        if (feedbacks)
+            jumpEffect.Play();
         playerAnimator.SetTrigger("Jumping");
         yield return new WaitForSeconds(airTime);
         jumping = false;
@@ -296,11 +329,13 @@ public class InputControllerAnimated : MonoBehaviour
 
     private IEnumerator DoubleJumpCoroutine()
     {
-        SFX[1].Play();
+        if (feedbacks)
+            SFX[1].Play();
         jumping = true;
         canDoubleJump = false;
         speed.y = 0;
-        doubleJumpEffect.Play();
+        if (feedbacks)
+            doubleJumpEffect.Play();
         playerAnimator.SetTrigger("DoubleJumping");
         yield return new WaitForSeconds(airTime * doubleJumpMultiplier);
         canDash = true;
@@ -315,8 +350,10 @@ public class InputControllerAnimated : MonoBehaviour
         dashing = true;
         canDash = false;
         timeDashing = 0;
-        trail.emitting = true;
-        playerAnimator.SetTrigger("Dashing");
+        if (feedbacks)
+            trail.emitting = true;
+        if (feedbacks)
+            playerAnimator.SetTrigger("Dashing");
         while (timeDashing < dashDuration)
         {
             trail.time = 1;
@@ -331,18 +368,42 @@ public class InputControllerAnimated : MonoBehaviour
     {
         wallJumpDirection = -wallDirection;
         wallJumping = true;
-        if (wallDirection == -1) { wallJumpedFromLeft = true; wallJumpedFromRight = false; leftWallJumpEffect.Play(); SFX[5].Play(); }
-        else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); SFX[4].Play(); }
+        if (wallDirection == -1) { 
+            wallJumpedFromLeft = true; 
+            wallJumpedFromRight = false;
+            if (feedbacks) 
+                leftWallJumpEffect.Play();
+            if (feedbacks) 
+                SFX[5].Play(); }
+        else 
+        { 
+            wallJumpedFromRight = true; 
+            wallJumpedFromLeft = false;
+            if (feedbacks) 
+                rightWallJumpEffect.Play();
+            if (feedbacks) 
+                SFX[4].Play(); }
         yield return new WaitForSeconds(wallJumpDuration);
         wallJumping = false;
     }
 
-    private void levelFinished()
+    private void LevelFinished()
     {
         if (!gamePaused)
         {
             gamePaused = true;
             gameManager.EndLevelMenu();
         }
+    }
+
+    private void gamePause()
+    {
+        gamePaused = !gamePaused;
+        if (gamePaused)
+        {
+            gameManager.GamePausedMenu();
+        }
+        //else
+            //gameManager.GameUnPaused();
     }
 }
