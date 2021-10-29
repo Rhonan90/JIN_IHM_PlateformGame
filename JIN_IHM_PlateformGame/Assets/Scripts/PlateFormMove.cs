@@ -18,6 +18,10 @@ public class PlateFormMove : MonoBehaviour
         }
         transform.position += new Vector3( speed * Time.deltaTime,0,0);
         time+=Time.deltaTime;
+    }
 
+    public float getPlateformSpeed()
+    {
+        return speed;
     }
 }

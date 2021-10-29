@@ -224,7 +224,7 @@ public class InputControllerAnimated : MonoBehaviour
             {
                 if (hits[i].transform.gameObject.CompareTag("Lava"))
                 {
-                    //position = respawnPoint.position;
+                    position = respawnPoint.position;
                     Debug.Log("lavaaaaaa");
                 }
                 if (!hits[i].collider.isTrigger)
@@ -232,6 +232,11 @@ public class InputControllerAnimated : MonoBehaviour
                     if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe � travers les sols gris sauf en descendant
                     {
                         return false;
+                    }
+                    if (hits[i].transform.gameObject.CompareTag("Moving") && direction == Vector2.down)  //On bouge avec les plateformes mobiles
+                    {
+                        PlateFormMove plateform = hits[i].transform.gameObject.GetComponent<PlateFormMove>();
+                        position += new Vector2(plateform.getPlateformSpeed(), 0) * Time.deltaTime;
                     }
                     return true;
                 }
