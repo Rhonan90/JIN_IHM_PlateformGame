@@ -212,7 +212,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     private bool CheckCollisions(Collider2D moveCollider, Vector2 direction, float distance)
     {
-        bool colliding;
+        bool colliding = false;
         if (moveCollider!=null)
         {
             RaycastHit2D[] hits = new RaycastHit2D[10];
@@ -224,23 +224,26 @@ public class InputControllerAnimated : MonoBehaviour
             {
                 if (hits[i].transform.gameObject.CompareTag("Lava"))
                 {
-                    position = respawnPoint.position;
-                    Debug.Log("lavaaaaaa");
+                    position = respawnPoint.position;  //on respawn quand onn tombe dans la lave
                 }
                 if (!hits[i].collider.isTrigger)
                 {
                     if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe � travers les sols gris sauf en descendant
                     {
-                        return false;
+                        //return false;
                     }
+                    else
+                        colliding = true;
                     if (hits[i].transform.gameObject.CompareTag("Moving") && direction == Vector2.down)  //On bouge avec les plateformes mobiles
                     {
                         PlateFormMove plateform = hits[i].transform.gameObject.GetComponent<PlateFormMove>();
                         position += new Vector2(plateform.getPlateformSpeed(), 0) * Time.deltaTime;
                     }
-                    return true;
+                    
                 }
             }
+            if (colliding)
+                return true;
         }
         return false;
     }
