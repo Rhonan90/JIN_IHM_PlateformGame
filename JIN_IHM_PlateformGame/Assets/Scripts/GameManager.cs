@@ -38,7 +38,8 @@ public class GameManager : MonoBehaviour
 
     public void NextLevelScene()
     {
-        if (currentLevelId < 4)
+        currentLevelId = SceneManager.GetActiveScene().buildIndex;
+        if (currentLevelId < 5)
         {
             currentLevelId++;
         }

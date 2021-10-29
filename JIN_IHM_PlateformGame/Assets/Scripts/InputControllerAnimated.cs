@@ -30,6 +30,7 @@ public class InputControllerAnimated : MonoBehaviour
     public int target = 150;
 
     private AudioSource[] SFX;
+    private bool respawn = false;
     private bool sprint = false;
     private bool jump = false;
     private bool jumping = false;
@@ -74,9 +75,10 @@ public class InputControllerAnimated : MonoBehaviour
 
     //Game Management
     private bool ControlsActivated = true;
-    private bool JumpActivated = true;
-    private bool DoubleJumpActivated = true;
-    private bool WallJumpActivated = true;
+    private bool JumpActivated = false;
+    private bool DoubleJumpActivated = false;
+    private bool WallJumpActivated = false;
+    private bool DashActivated = false;
     private Transform respawnPoint;
 
     private GameManager gameManager;
@@ -92,7 +94,25 @@ public class InputControllerAnimated : MonoBehaviour
         respawnPoint = GameObject.Find("RespawnPoint").transform;
         SFX = GameObject.Find("SFX").GetComponents<AudioSource>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-    }
+
+        int currentLevel = gameManager.getLevelId();
+        if (currentLevel>0)
+        {
+            JumpActivated = true;
+            if (currentLevel >1)
+            {
+                WallJumpActivated = true;
+                if (currentLevel > 2)
+                {
+                    DoubleJumpActivated = true;
+                    if (currentLevel > 3)
+                    {
+                        DashActivated = true;
+                    }
+                }
+            }
+        }
+}
 
     private void Update()
     {
@@ -101,6 +121,12 @@ public class InputControllerAnimated : MonoBehaviour
 
         if (ControlsActivated && !gamePaused)
             getInput();
+
+        if (respawn)
+        {
+            speed = Vector2.zero;
+            position = respawnPoint.position;
+        }
 
         acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )) ;
 
@@ -187,7 +213,7 @@ public class InputControllerAnimated : MonoBehaviour
             StartCoroutine("DoubleJumpCoroutine");
         }
 
-        if(dash && !dashing && canDash && !touchingFloor) //Le joueur peut dash dans les airs une fois, le saut permet de dash � nouveau
+        if(dash && !dashing && canDash && DashActivated && !touchingFloor) //Le joueur peut dash dans les airs une fois, le saut permet de dash � nouveau
         {
             StartCoroutine("DashCoroutine");
         }
@@ -209,6 +235,7 @@ public class InputControllerAnimated : MonoBehaviour
         jump = Input.GetButtonDown("Jump");
         sprint = Input.GetButton("Sprint");
         dash = Input.GetButton("Dash");
+        respawn = Input.GetButtonDown("Respawn");
     }
 
     private bool CheckCollisions(Collider2D moveCollider, Vector2 direction, float distance)
