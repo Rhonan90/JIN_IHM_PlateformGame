@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(InputControllerAnimated))]
-[CanEditMultipleObjects]
 public class InputControllerAnimated : MonoBehaviour
 {
 
@@ -81,6 +79,9 @@ public class InputControllerAnimated : MonoBehaviour
     private bool WallJumpActivated = true;
     private Transform respawnPoint;
 
+    private GameManager gameManager;
+    private bool gamePaused = false;
+
     private void Awake()
     {
         position = transform.position;
@@ -90,7 +91,7 @@ public class InputControllerAnimated : MonoBehaviour
         Application.targetFrameRate = target;
         respawnPoint = GameObject.Find("RespawnPoint").transform;
         SFX = GameObject.Find("SFX").GetComponents<AudioSource>();
-
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     private void Update()
@@ -98,7 +99,7 @@ public class InputControllerAnimated : MonoBehaviour
         if (Application.targetFrameRate != target)
             Application.targetFrameRate = target;
 
-        if (ControlsActivated)
+        if (ControlsActivated && !gamePaused)
             getInput();
 
         acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )) ;
@@ -226,6 +227,10 @@ public class InputControllerAnimated : MonoBehaviour
                 {
                     position = respawnPoint.position;  //on respawn quand onn tombe dans la lave
                 }
+                if (hits[i].transform.gameObject.CompareTag("Victory"))
+                {
+                    levelFinished();
+                }
                 if (!hits[i].collider.isTrigger)
                 {
                     if ( direction != Vector2.down && hits[i].transform.gameObject.CompareTag("UpGround"))  //On passe � travers les sols gris sauf en descendant
@@ -303,5 +308,14 @@ public class InputControllerAnimated : MonoBehaviour
         else { wallJumpedFromRight = true; wallJumpedFromLeft = false; rightWallJumpEffect.Play(); SFX[4].Play(); }
         yield return new WaitForSeconds(wallJumpDuration);
         wallJumping = false;
+    }
+
+    private void levelFinished()
+    {
+        if (!gamePaused)
+        {
+            gamePaused = true;
+            gameManager.EndLevelMenu();
+        }
     }
 }
