@@ -21,10 +21,16 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         if (instance == null)
+        {
             instance = this;
+            feedbacks = true;
+        }
 
         if (instance != null)
+        {
             this.currentLevelId = instance.currentLevelId;
+            this.feedbacks = instance.feedbacks;
+        }
 
         if (instance != null && instance != this)
         {
@@ -32,6 +38,7 @@ public class GameManager : MonoBehaviour
             instance = this;    
         }
         currentLevelId = SceneManager.GetActiveScene().buildIndex;
+
     }
 
     public void LoadScene(int levelId)
@@ -83,14 +90,51 @@ public class GameManager : MonoBehaviour
         return currentLevelId;
     }
 
-    public void setFeedbacks(bool enabled)
+    public void setFeedbacks()
     {
-        feedbacks = enabled;
-        Debug.Log("switch");
+        feedbacks = !feedbacks;
+        Debug.Log("switch, feedbacks set to "+feedbacks);
     }
 
     public bool getFeedbacks()
     {
         return feedbacks;
+    }
+
+    public void feedBacksOnText(GameObject text)
+    {
+        if (feedbacks)
+        {
+            text.SetActive(true);
+        }
+        else
+            text.SetActive(false);
+    }
+
+    public void feedBacksOffText(GameObject text)
+    {
+        if (feedbacks)
+        {
+            text.SetActive(false);
+        }
+        else
+            text.SetActive(true);
+    }
+
+    public void optionsMenuOn(GameObject textOn)
+    {
+        if (feedbacks)
+        {
+            textOn.SetActive(true);
+        }
+    }
+
+    public void optionsMenuOff(GameObject textOff)
+    {
+        if (!feedbacks)
+        {
+            textOff.SetActive(true);
+        }
+
     }
 }

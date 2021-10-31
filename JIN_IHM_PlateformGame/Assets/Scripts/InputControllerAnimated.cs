@@ -94,7 +94,7 @@ public class InputControllerAnimated : MonoBehaviour
 
     //Game Management
     private bool feedbacks=true;
-    private bool ControlsActivated = true;
+    private bool ControlsActivated;
     private bool JumpActivated = true;
     private bool DoubleJumpActivated = false;
     private bool WallJumpActivated = false;
@@ -117,7 +117,6 @@ public class InputControllerAnimated : MonoBehaviour
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         int currentLevel = gameManager.getLevelId();
-        Debug.Log(currentLevel);
 
         if (currentLevel >1)
         {
@@ -131,10 +130,10 @@ public class InputControllerAnimated : MonoBehaviour
                 }
             }
         }
+        ControlsActivated = true;
         feedbacks = gameManager.getFeedbacks();
         playerAnimator.enabled = feedbacks;
 
-        Debug.Log(feedbacks);
     }
 
     private void Update()
@@ -142,8 +141,7 @@ public class InputControllerAnimated : MonoBehaviour
         if (Application.targetFrameRate != target)
             Application.targetFrameRate = target;
 
-        if (ControlsActivated && !gamePaused)
-            getInput();
+        getInput();
 
         if (pause)
             gamePause();
@@ -261,11 +259,14 @@ public class InputControllerAnimated : MonoBehaviour
 
     private void getInput()
     {
-        inputs = new Vector2(Input.GetAxis("Horizontal"), 0f);
-        jump = Input.GetButtonDown("Jump");
-        sprint = Input.GetButton("Sprint");
-        dash = Input.GetButton("Dash");
-        respawn = Input.GetButtonDown("Respawn");
+        if (ControlsActivated)
+        {
+            inputs = new Vector2(Input.GetAxis("Horizontal"), 0f);
+            jump = Input.GetButtonDown("Jump");
+            sprint = Input.GetButton("Sprint");
+            dash = Input.GetButton("Dash");
+            respawn = Input.GetButtonDown("Respawn");
+        }
         pause = Input.GetButtonDown("Pause");
     }
 
@@ -393,6 +394,7 @@ public class InputControllerAnimated : MonoBehaviour
         {
             gamePaused = true;
             gameManager.EndLevelMenu();
+            ControlsActivated = false;
         }
     }
 
@@ -402,8 +404,12 @@ public class InputControllerAnimated : MonoBehaviour
         if (gamePaused)
         {
             gameManager.GamePausedMenu();
+            ControlsActivated = false;
         }
-        //else
-            //gameManager.GameUnPaused();
+        else
+        {
+            gameManager.GameUnPaused();
+            ControlsActivated = true;
+        }
     }
 }
