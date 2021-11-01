@@ -205,19 +205,32 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 9132940029039109668, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
       propertyPath: m_Text
-      value: Dash in air ! Dash is reseted on jump !
+      value: "Dash in air with LEFT CTRL or LB !\n (tips :Dash is reseted on jump
+        !)"
       objectReference: {fileID: 0}
     - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.47397467
+      objectReference: {fileID: 0}
+    - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.47397467
+      objectReference: {fileID: 0}
+    - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.47397467
+      objectReference: {fileID: 0}
+    - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.68
+      value: 1.3044
       objectReference: {fileID: 0}
     - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.22
+      value: 6.9347
       objectReference: {fileID: 0}
     - target: {fileID: 9132940029039109669, guid: a144a01754cffdd4386dce7f51831dd6, type: 3}
       propertyPath: m_LocalPosition.z
