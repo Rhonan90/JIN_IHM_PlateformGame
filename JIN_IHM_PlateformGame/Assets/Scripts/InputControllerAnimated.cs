@@ -52,11 +52,11 @@ public class InputControllerAnimated : MonoBehaviour
     [Space(10)]
     [Header("Player caracteristics")]
     [Range(50, 150)]
-    public float movementAcceleration = 135;        //Vitesse du joueur
+    public float movementAcceleration = 75;        //Vitesse du joueur
     [Range(10, 50)]
-    public float maxMovementSpeed = 40;     //Vitesse maximale du joueur
+    public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
     [Range(0.9f, 1)]
-    public float inertiaFactor = 0.92f;     //Facteur inertielle [0,1]
+    public float inertiaFactor = 0.95f;     //Facteur inertielle [0,1]
 
     [Space(10)]
     [Header("World caracteristics")]
