@@ -51,12 +51,12 @@ public class InputControllerAnimated : MonoBehaviour
 
     [Space(10)]
     [Header("Player caracteristics")]
-    [Range(50, 100)]
-    public float movementAcceleration = 75;        //Vitesse du joueur
-    [Range(10, 30)]
-    public float maxMovementSpeed = 20;     //Vitesse maximale du joueur
+    [Range(50, 150)]
+    public float movementAcceleration = 135;        //Vitesse du joueur
+    [Range(10, 50)]
+    public float maxMovementSpeed = 40;     //Vitesse maximale du joueur
     [Range(0.9f, 1)]
-    public float inertiaFactor = 0.96f;     //Facteur inertielle [0,1]
+    public float inertiaFactor = 0.92f;     //Facteur inertielle [0,1]
 
     [Space(10)]
     [Header("World caracteristics")]
@@ -152,7 +152,7 @@ public class InputControllerAnimated : MonoBehaviour
             position = respawnPoint.position;
         }
 
-        acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /2 : 0)), jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )) ;
+        acceleration = (inputs * (sprint ? sprintVelocityModifier : 1) + new Vector2((dashing ? dashForce : (wallJumping ? wallJumpDirection * wallJumpForce /3 : 0)), jumping ? jumpForce : (wallJumping ? wallJumpForce : customGravity) )) ;
 
         speed.y += acceleration.y * Time.deltaTime;
         if (dashing)
@@ -172,7 +172,6 @@ public class InputControllerAnimated : MonoBehaviour
         {
             speed.y = 0;
             playerAnimator.SetBool("OnFloor", true);
-            canDoubleJump = true;
         }
         else
             playerAnimator.SetBool("OnFloor", false);
@@ -220,7 +219,8 @@ public class InputControllerAnimated : MonoBehaviour
             timeOnFloor += Time.deltaTime;
             canDash = true;
             wallJumpedFromLeft = false;
-            wallJumpedFromRight = false; 
+            wallJumpedFromRight = false;
+            canDoubleJump = true;
         }
         else
         {   

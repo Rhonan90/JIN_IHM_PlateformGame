@@ -24511,7 +24511,7 @@ MonoBehaviour:
   doubleJumpMultiplier: 1
   wallJumpForce: 120
   wallJumpDuration: 0.2
-  dashForce: -200
+  dashForce: 200
   dashDuration: 0.2
   airSpeedMultiplier: 0.7
   timeBeforeRejumpInAir: 0
