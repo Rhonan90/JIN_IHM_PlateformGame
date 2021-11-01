@@ -172,6 +172,7 @@ public class InputControllerAnimated : MonoBehaviour
         {
             speed.y = 0;
             playerAnimator.SetBool("OnFloor", true);
+            canDoubleJump = true;
         }
         else
             playerAnimator.SetBool("OnFloor", false);
@@ -323,7 +324,6 @@ public class InputControllerAnimated : MonoBehaviour
         playerAnimator.SetTrigger("Jumping");
         yield return new WaitForSeconds(airTime);
         jumping = false;
-        canDoubleJump = true;
         timeAfterFirstJump = 0;
         
     }

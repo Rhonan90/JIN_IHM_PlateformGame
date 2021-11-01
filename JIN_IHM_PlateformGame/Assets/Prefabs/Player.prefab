@@ -24503,7 +24503,7 @@ MonoBehaviour:
   target: 150
   movementAcceleration: 75
   maxMovementSpeed: 20
-  inertiaFactor: 0.96
+  inertiaFactor: 0.95
   customGravity: -150
   wallResistance: 1.5
   jumpForce: 100
