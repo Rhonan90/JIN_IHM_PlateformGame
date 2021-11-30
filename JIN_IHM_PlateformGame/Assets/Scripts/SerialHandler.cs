@@ -16,7 +16,6 @@ public class SerialHandler : MonoBehaviour
     [SerializeField] private int baudrate = 9600;
 
 
-    [SerializeField] private GameObject[][] obstacles;
     [SerializeField] private Colors[] colors;
 
     [Range(0, 255)]
@@ -41,9 +40,9 @@ public class SerialHandler : MonoBehaviour
         }
 
 
-        for (int j = 0; j < obstacles.Length; j++)
+        for (int j = 0; j < colors.Length; j++)
         {
-            for (int i = 0; i < obstacles[j].Length; i++)
+            for (int i = 0; i < colors[j].obstacle.Length; i++)
             {
                 _obstacleBoxCollider2D[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<BoxCollider2D>();
                 _obstacleSprite[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<SpriteRenderer>();
