@@ -2,6 +2,9 @@ using System;
 using System.IO;
 using System.IO.Ports;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
 
 public class SerialHandler : MonoBehaviour
 {
@@ -12,12 +15,14 @@ public class SerialHandler : MonoBehaviour
     [SerializeField] private string serialPort = "COM1";
     [SerializeField] private int baudrate = 9600;
 
-    [SerializeField] private GameObject[] obstacles;
-    [SerializeField] private Color32 obstacleColor;
+
+    [SerializeField] private GameObject[][] obstacles;
+    [SerializeField] private Colors[] colors;
+
     [Range(0, 255)]
     [SerializeField] private int inactiveObstacleColorAlpha;
-    private BoxCollider2D[] _obstacleBoxCollider2D;
-    private SpriteRenderer[] _obstacleSprite;
+    private BoxCollider2D[][] _obstacleBoxCollider2D;
+    private SpriteRenderer[][] _obstacleSprite;
 
     // Start is called before the first frame update
     void Start()
@@ -25,15 +30,26 @@ public class SerialHandler : MonoBehaviour
         _serial = new SerialPort(serialPort, baudrate);
         // Once configured, the serial communication must be opened just like a file : the OS handles the communication.
         _serial.Open();
-        _obstacleBoxCollider2D = new BoxCollider2D[obstacles.Length];
-        _obstacleSprite = new SpriteRenderer[obstacles.Length];
 
-        for (int i = 0; i < obstacles.Length; i++)
+        for (int j = 0; j < colors.Length; j++)
         {
-            _obstacleBoxCollider2D[i] = obstacles[i].gameObject.transform.GetComponent<BoxCollider2D>();
-            _obstacleSprite[i] = obstacles[i].gameObject.transform.GetComponent<SpriteRenderer>();
-            _obstacleSprite[i].color = new Color32(obstacleColor.r, obstacleColor.g, obstacleColor.b, ((byte)inactiveObstacleColorAlpha));
-            _obstacleBoxCollider2D[i].isTrigger = true;
+            for (int i = 0; i < colors[j].obstacle.Length; i++)
+            {
+                _obstacleBoxCollider2D[j] = new BoxCollider2D[colors.Length];
+                _obstacleSprite[j] = new SpriteRenderer[colors.Length];
+            }
+        }
+
+
+        for (int j = 0; j < obstacles.Length; j++)
+        {
+            for (int i = 0; i < obstacles[j].Length; i++)
+            {
+                _obstacleBoxCollider2D[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<BoxCollider2D>();
+                _obstacleSprite[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<SpriteRenderer>();
+                _obstacleSprite[j][i].color = new Color32(colors[j].color.r, colors[j].color.g, colors[j].color.b, ((byte)inactiveObstacleColorAlpha));
+                _obstacleBoxCollider2D[j][i].isTrigger = true;
+            }
         }
     }
 
@@ -52,23 +68,25 @@ public class SerialHandler : MonoBehaviour
         {
             message = message.Trim('\r');
         }
+        char[] number = new char[1];
+        int color = (int)Char.GetNumericValue(number[0]);
 
-        switch (message)
+        switch (message.TrimEnd(number))
         {
             case "inactive":
-                for (int i = 0; i < obstacles.Length; i++)
-                {
-                    _obstacleBoxCollider2D[i].isTrigger = true;
-                    _obstacleSprite[i].color = new Color32(obstacleColor.r, obstacleColor.g, obstacleColor.b, ((byte)inactiveObstacleColorAlpha));
-                }
+                    for (int i = 0; i < colors[color].obstacle.Length; i++)
+                    {
+                        _obstacleBoxCollider2D[color][i].isTrigger = true;
+                        _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)inactiveObstacleColorAlpha));
+                    }
                 SetLed(false);
                 break;
             case "active":
-                for (int i = 0; i < obstacles.Length; i++)
-                {
-                    _obstacleBoxCollider2D[i].isTrigger = false;
-                    _obstacleSprite[i].color = new Color32(obstacleColor.r, obstacleColor.g, obstacleColor.b, 255);
-                }
+                    for (int i = 0; i < colors[color].obstacle.Length; i++)
+                    {
+                        _obstacleBoxCollider2D[color][i].isTrigger = false;
+                        _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)inactiveObstacleColorAlpha));
+                    }             
                 SetLed(true);
                 break;
         }
