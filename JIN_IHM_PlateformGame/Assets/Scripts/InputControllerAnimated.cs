@@ -105,6 +105,9 @@ public class InputControllerAnimated : MonoBehaviour
     private bool gamePaused = false;
     private bool pause = false;
 
+    //ARDUINO
+    [SerializeField] private SerialHandler serialHandler;
+
     private void Awake()
     {
         position = transform.position;

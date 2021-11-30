@@ -1,4 +1,0 @@
-﻿[*.cs]
-
-# S1104: Fields should not have public accessibility
-dotnet_diagnostic.S1104.severity = none
