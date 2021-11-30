@@ -19,6 +19,8 @@ public class SerialHandler : MonoBehaviour
     [SerializeField] private Colors[] colors;
 
     [Range(0, 255)]
+    [SerializeField] private int activeObstacleColorAlpha;
+    [Range(0, 255)]
     [SerializeField] private int inactiveObstacleColorAlpha;
     private BoxCollider2D[][] _obstacleBoxCollider2D;
     private SpriteRenderer[][] _obstacleSprite;
@@ -30,13 +32,12 @@ public class SerialHandler : MonoBehaviour
         // Once configured, the serial communication must be opened just like a file : the OS handles the communication.
         _serial.Open();
 
+        _obstacleBoxCollider2D = new BoxCollider2D[colors.Length][];
+        _obstacleSprite = new SpriteRenderer[colors.Length][];
         for (int j = 0; j < colors.Length; j++)
         {
-            for (int i = 0; i < colors[j].obstacle.Length; i++)
-            {
-                _obstacleBoxCollider2D[j] = new BoxCollider2D[colors.Length];
-                _obstacleSprite[j] = new SpriteRenderer[colors.Length];
-            }
+            _obstacleBoxCollider2D[j] = new BoxCollider2D[colors[j].obstacle.Length];
+            _obstacleSprite[j] = new SpriteRenderer[colors[j].obstacle.Length];
         }
 
 
@@ -47,7 +48,6 @@ public class SerialHandler : MonoBehaviour
                 _obstacleBoxCollider2D[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<BoxCollider2D>();
                 _obstacleSprite[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<SpriteRenderer>();
                 _obstacleSprite[j][i].color = new Color32(colors[j].color.r, colors[j].color.g, colors[j].color.b, ((byte)inactiveObstacleColorAlpha));
-                _obstacleBoxCollider2D[j][i].isTrigger = true;
             }
         }
     }
@@ -67,10 +67,11 @@ public class SerialHandler : MonoBehaviour
         {
             message = message.Trim('\r');
         }
-        char[] number = new char[1];
-        int color = (int)Char.GetNumericValue(number[0]);
+        var number = message[message.Length - 1];
+        message = message.Remove(message.Length - 1);
+        int color = (int)Char.GetNumericValue(number);
 
-        switch (message.TrimEnd(number))
+        switch (message)
         {
             case "inactive":
                     for (int i = 0; i < colors[color].obstacle.Length; i++)
@@ -84,7 +85,7 @@ public class SerialHandler : MonoBehaviour
                     for (int i = 0; i < colors[color].obstacle.Length; i++)
                     {
                         _obstacleBoxCollider2D[color][i].isTrigger = false;
-                        _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)inactiveObstacleColorAlpha));
+                        _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)activeObstacleColorAlpha));
                     }             
                 SetLed(true);
                 break;
