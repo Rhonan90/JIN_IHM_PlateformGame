@@ -39,6 +39,7 @@ public class Bouton : MonoBehaviour
 
     private void changeLed()
     {
+        _serialHandler.messageInterne = (_ledIsOn ? "active" : "inactive");
         _serialHandler.SetLed(_ledIsOn = !_ledIsOn);
         gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, (_ledIsOn ? -0.3f : 0), transform.localPosition.z);
     }

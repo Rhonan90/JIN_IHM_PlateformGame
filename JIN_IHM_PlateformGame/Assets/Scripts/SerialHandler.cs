@@ -25,6 +25,8 @@ public class SerialHandler : MonoBehaviour
     private BoxCollider2D[][] _obstacleBoxCollider2D;
     private SpriteRenderer[][] _obstacleSprite;
 
+    public string messageInterne = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,8 +48,9 @@ public class SerialHandler : MonoBehaviour
             for (int i = 0; i < colors[j].obstacle.Length; i++)
             {
                 _obstacleBoxCollider2D[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<BoxCollider2D>();
+                _obstacleBoxCollider2D[j][i].isTrigger = true;
                 _obstacleSprite[j][i] = colors[j].obstacle[i].gameObject.transform.GetComponent<SpriteRenderer>();
-                _obstacleSprite[j][i].color = new Color32(colors[j].color.r, colors[j].color.g, colors[j].color.b, ((byte)inactiveObstacleColorAlpha));
+                _obstacleSprite[j][i].color = new Color32(colors[j].color.r, colors[j].color.g, colors[j].color.b, (_obstacleBoxCollider2D[j][i].isTrigger ? (byte)inactiveObstacleColorAlpha : (byte)activeObstacleColorAlpha));
             }
         }
     }
@@ -58,6 +61,8 @@ public class SerialHandler : MonoBehaviour
         // Prevent blocking if no message is available as we are not doing anything else
         // Alternative solutions : set a timeout, read messages in another thread, coroutines, futures...
         if (_serial.BytesToRead <= 0) return;
+
+
 
         var message = _serial.ReadLine();
 
@@ -72,6 +77,12 @@ public class SerialHandler : MonoBehaviour
         message = message.Remove(message.Length - 1);
         int color = (int)Char.GetNumericValue(number);
 
+        if (messageInterne != null)
+        {
+            message = messageInterne;
+            color = colors.Length - 1;
+        }
+
         switch (message)
         {
             case "inactive":
@@ -80,17 +91,16 @@ public class SerialHandler : MonoBehaviour
                         _obstacleBoxCollider2D[color][i].isTrigger = true;
                         _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)inactiveObstacleColorAlpha));
                     }
-                SetLed(false);
                 break;
             case "active":
                     for (int i = 0; i < colors[color].obstacle.Length; i++)
                     {
                         _obstacleBoxCollider2D[color][i].isTrigger = false;
                         _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)activeObstacleColorAlpha));
-                    }             
-                SetLed(true);
+                    }
                 break;
         }
+        messageInterne = null;
     }
 
     public void SetLed(bool newState)

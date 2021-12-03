@@ -7,4 +7,5 @@ public class Colors
 {
     public GameObject[] obstacle; 
     public Color32 color;
+
 }
