@@ -1029,7 +1029,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serialPort: COM3
-  baudrate: 19200
+  baudrate: 115200
   colors:
   - obstacle:
     - {fileID: 805828561}
@@ -1050,6 +1050,7 @@ MonoBehaviour:
       rgba: 16713472
   activeObstacleColorAlpha: 255
   inactiveObstacleColorAlpha: 50
+  messageInterne: 
 --- !u!4 &1403320701
 Transform:
   m_ObjectHideFlags: 0

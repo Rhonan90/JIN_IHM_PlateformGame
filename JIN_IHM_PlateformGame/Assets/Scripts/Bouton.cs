@@ -32,15 +32,17 @@ public class Bouton : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            if (!_ledIsOn)
+            if (!_ledIsOn) {
                 changeLed();
+                StartCoroutine(timerCoroutine());
+            }
         }
     }
 
     private void changeLed()
     {
-        _serialHandler.messageInterne = (_ledIsOn ? "active" : "inactive");
         _serialHandler.SetLed(_ledIsOn = !_ledIsOn);
+        _serialHandler.messageInterne = (_ledIsOn ? "active" : "inactive");
         gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, (_ledIsOn ? -0.3f : 0), transform.localPosition.z);
     }
 
