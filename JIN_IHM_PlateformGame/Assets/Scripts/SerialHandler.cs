@@ -94,7 +94,7 @@ public class SerialHandler : MonoBehaviour
 
     public void SetLed(bool newState)
     {
-        _serial.WriteLine(newState ? "LED ON" : "LED OFF");
+        _serial.WriteLine(newState ? "notifyActiveYellow" : "notifyInactiveYellow");
     }
 
     private void OnDestroy()
