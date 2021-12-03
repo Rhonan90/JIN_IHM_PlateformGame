@@ -580,6 +580,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 878594636587532468, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 878594636587532469, guid: 623d87facceefe74aa351cd8b186f829, type: 3}
       propertyPath: serialHandler
       value: 
@@ -1556,7 +1560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc3f20feacca1a744a68582ee999bbc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _serialHandler: {fileID: 1403320700}
+  _serialHandler: {fileID: 0}
 --- !u!61 &2094039264
 BoxCollider2D:
   m_ObjectHideFlags: 0

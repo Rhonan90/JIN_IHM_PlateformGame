@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Bouton : MonoBehaviour
 {
-    [SerializeField]
+   [SerializeField]
     private SerialHandler _serialHandler;
 
     private bool _ledIsOn = false;
@@ -15,6 +15,7 @@ public class Bouton : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             _serialHandler.SetLed( _ledIsOn = !_ledIsOn);
+            gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, (_ledIsOn ? -0.3f : 0) , transform.localPosition.z);
         }
     }
 }

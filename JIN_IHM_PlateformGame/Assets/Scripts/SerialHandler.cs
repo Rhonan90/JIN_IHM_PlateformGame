@@ -95,7 +95,6 @@ public class SerialHandler : MonoBehaviour
     public void SetLed(bool newState)
     {
         _serial.WriteLine(newState ? "notifyActiveYellow" : "notifyInactiveYellow");
-        gameObject.transform.position = new Vector3(gameObject.transform.position.x, -0.3f , transform.position.z);
     }
 
     private void OnDestroy()
