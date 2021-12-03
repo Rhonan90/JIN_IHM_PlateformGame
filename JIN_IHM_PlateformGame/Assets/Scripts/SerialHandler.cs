@@ -61,6 +61,7 @@ public class SerialHandler : MonoBehaviour
 
         var message = _serial.ReadLine();
 
+
         // Arduino sends "\r\n" with println, ReadLine() removes Environment.NewLine which will not be 
         // enough on Linux/MacOS.
         if (Environment.NewLine == "\n")
@@ -94,7 +95,7 @@ public class SerialHandler : MonoBehaviour
 
     public void SetLed(bool newState)
     {
-        _serial.WriteLine(newState ? "notifyActiveYellow" : "notifyInactiveYellow");
+        _serial.WriteLine(newState ? "notifyActiveBlue" : "notifyInactiveBlue");
     }
 
     private void OnDestroy()
