@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level 1.unity
     guid: 4928d928c323fcd41b754183b9bf49a2
+  - enabled: 1
+    path: Assets/Scenes/Arduino 1.unity
+    guid: 81a601e93b2979141b59cafecf23094f
+  - enabled: 1
+    path: Assets/Scenes/Arduino 2.unity
+    guid: 5e9e1c7452d92a4408c574a9c9367c6b
   m_configObjects: {}

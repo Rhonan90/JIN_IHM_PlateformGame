@@ -99,6 +99,13 @@ public class SerialHandler : MonoBehaviour
                         _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, ((byte)activeObstacleColorAlpha));
                     }
                 break;
+            case "change":
+                for (int i = 0; i < colors[color].obstacle.Length; i++)
+                {
+                    _obstacleBoxCollider2D[color][i].isTrigger = !_obstacleBoxCollider2D[color][i].isTrigger;
+                    _obstacleSprite[color][i].color = new Color32(colors[color].color.r, colors[color].color.g, colors[color].color.b, (_obstacleBoxCollider2D[color][i].isTrigger ? (byte)inactiveObstacleColorAlpha : (byte)activeObstacleColorAlpha));
+                }
+                break;
         }
         messageInterne = null;
     }
